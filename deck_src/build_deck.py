@@ -275,6 +275,45 @@ s.banner(MX, 8.15, CW, 1.6,
          "seguros en t−1 y pesos congelados desde el corte. Cualquier aleatorización filtraría el futuro hacia "
          "el pasado.", fill=AZUL, size=15.5)
 
+# ═══════════════════════════ 11 · FASE 0 · ANTI-LEAKAGE ═══════════════════════════
+s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Fase 0 · La frontera de información",
+      "La etapa que consumió más tiempo del proyecto: garantizar que ninguna variable conozca el futuro.")
+s.rect(MX, 3.25, 12.9, 0.6, fill=AZUL, radius=0.05)
+s.text(MX, 3.25, 12.9, 0.6, [para("INFORMACIÓN DISPONIBLE  ·  HASTA t−1", size=13.5, bold=True,
+                                  color=WHITE, align="c", space_after=0, spc=2)], valign="m")
+s.rect(MX + 13.3, 3.25, 4.6, 0.6, fill=ROJO, radius=0.05)
+s.text(MX + 13.3, 3.25, 4.6, 0.6, [para("MES t  ·  POR PRONOSTICAR", size=13.5, bold=True, color=WHITE,
+                                        align="c", space_after=0, spc=2)], valign="m")
+s.vline(MX + 13.1, 3.15, 2.6, color=ROJO, lw=2)
+pasado = ["Demanda rezagada\nt−1 y t−12", "Medias móviles\nde 3 y 12 meses",
+          "IPC de vestuario\ny macro en t−1", "Meses desde\nla última venta"]
+for i, t in enumerate(pasado):
+    x = MX + i * 3.27
+    s.rect(x, 4.05, 3.05, 1.5, fill=LIGHT, line=LINE, radius=0.05)
+    s.text(x + 0.2, 4.05, 2.65, 1.5, [para(t, size=13.5, color=TXT, align="c", space_after=0, line=1.22)],
+           valign="m")
+s.rect(MX + 13.3, 4.05, 4.6, 1.5, fill="FDECEF", line=ROJO, radius=0.05)
+s.text(MX + 13.5, 4.05, 4.2, 1.5,
+       [para("Plan comercial ex-ante", size=14, bold=True, color=ROJO, align="c", space_after=4),
+        para("precio y descuento del mes t: única señal del presente, porque la decide la empresa",
+             size=12.5, color=TXT, align="c", space_after=0, line=1.2)], valign="m")
+f0 = [("Auditoría variable por variable", ROJO,
+       "Se revisó una a una la disponibilidad temporal de cada variable y de cada transformación: medias "
+       "móviles, agregaciones y escalados pueden arrastrar señal del mes t sin que se note."),
+      ("Decenas de iteraciones", AMAR,
+       "Cada corrección de rezago cambiaba el comportamiento del ensamble. La arquitectura final es el "
+       "resultado de ese ciclo de revisión, reajuste y nueva medición."),
+      ("Pruebas automatizadas de integridad", AZUL,
+       "Una batería de tests verifica los rezagos en cada corrida. Las variables identificadas como fuente "
+       "de fuga se eliminaron o se rezagaron antes de volver a entrenar.")]
+for i, (t, col, txt) in enumerate(f0):
+    s.card(MX + i * 6.08, 5.95, 5.73, 2.6, t, [para(txt, size=13.8, color=TXT, space_after=0, line=1.24)],
+           accent=col, tsize=17)
+s.banner(MX, 8.75, CW, 1.25,
+         "Sin esta fase, cualquier resultado sería un artefacto: un modelo que ve el futuro siempre gana en "
+         "el papel y falla en producción. El 16,10 % vale porque se obtuvo bajo esta restricción.",
+         fill=AZUL, size=16)
+
 # ═══════════════════════════ 11 · BATERÍA DE MODELOS ═══════════════════════════
 s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Diez arquitecturas, un mismo protocolo",
       "Desde la heurística estacional de 1970 hasta los modelos fundacionales pre-entrenados de 2024.")
@@ -285,114 +324,146 @@ s.banner(MX, 9.35, CW, 0.67,
          "la comparación es una decisión de diseño, no un accidente.", fill=LIGHT2, color=TXT, size=14.5,
          bold=False)
 
-# ═══════════════════════════ 12 · ARQUITECTURA ═══════════════════════════
-s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Arquitectura ES-GBM: tres capas, tres problemas distintos")
-s.pill((W - 10.5) / 2, CT, 10.5, 0.72, "Demanda mensual agregada  ·  58 familias comerciales (2020–2025)",
-       fill=INK, size=15)
-layers = [("CAPA 1", "Desacoplamiento estructural", ROJO,
-           ["Holt amortiguado sobre la serie de familia",
-            "Extrae nivel, tendencia e inercia estacional",
-            "La señal continua y predecible de la categoría"]),
-          ("CAPA 2", "Residuos comerciales", AMAR_D,
-           ["Ensamble GBDT: XGBoost · LightGBM · CatBoost",
-            "Modelo fundacional tabular TabPFN",
-            "Escala arcsinh y ponderación con decay de 24 meses",
-            "Aquí entran precio y descuento ex-ante"]),
-          ("CAPA 3", "Integración y desagregación", AZUL,
-           ["Ponderación NNLS + ruteo por momentum: umbral τ* entre 1,05 y 1,50",
-            "Desagregación top-down con proporciones históricas",
-            "Coherencia jerárquica exacta: las cuotas suman 1"])]
-cw2, gap = 5.6, 0.55
-for i, (num, tit, col, bs) in enumerate(layers):
-    x = MX + i * (cw2 + gap)
-    y, hh = 3.62, 4.5
-    s.rect(x, y, cw2, hh, fill=LIGHT, radius=0.06)
-    s.rect(x, y, cw2, 0.62, fill=col, radius=0.06)
-    s.rect(x, y + 0.35, cw2, 0.27, fill=col)
-    s.text(x, y, cw2, 0.62, [para(num, size=14, bold=True, color=WHITE, align="c", space_after=0, spc=2)],
+# ═══════════════════════════ 13 · ARQUITECTURA ═══════════════════════════
+s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Arquitectura ES-GBM: dos tracks en paralelo, un ensamble ponderado")
+s.pill((W - 13.0) / 2, 2.38, 13.0, 0.55,
+       "Fase 0  ·  Panel Familia × Fecha con variables auditadas y rezagadas", fill=INK, size=13.5)
+tracks = [(MX, 6.9, "CAPA 1  ·  SIN SUAVIZAMIENTO", ROJO, "Modelos sobre la serie directa",
+           ["XGBoost · LightGBM · CatBoost", "Escala arcsinh con decay de 24 meses",
+            "Reactiva: sigue los giros bruscos", "3 predicciones"]),
+          (MX + 7.2, 6.9, "CAPA 2  ·  CON SUAVIZAMIENTO", AMAR_D, "Modelos sobre la serie relativa al nivel",
+           ["LightGBM · CatBoost", "Escala log(1 + unidades / nivel)",
+            "Nivel base extraído por Holt amortiguado", "2 predicciones"]),
+          (MX + 14.4, 3.5, "EN PARALELO", AZUL, "TabPFN",
+           ["Modelo fundacional tabular", "Inferencia zero-shot", "1 predicción"])]
+ty, th = 3.12, 2.62
+for x, wd, cap, col, tit, bs in tracks:
+    s.rect(x, ty, wd, th, fill=LIGHT, radius=0.055)
+    s.rect(x, ty, wd, 0.5, fill=col, radius=0.055)
+    s.rect(x, ty + 0.28, wd, 0.22, fill=col)
+    s.text(x, ty, wd, 0.5, [para(cap, size=11.5, bold=True, color=WHITE, align="c", space_after=0, spc=1.6)],
            valign="m")
-    s.text(x + 0.42, y + 0.85, cw2 - 0.84, 0.6,
-           [para(tit, size=17.5, bold=True, color=INK, space_after=0, line=1.1)])
-    s.text(x + 0.42, y + 1.62, cw2 - 0.84, hh - 2.0, [b(t, size=13.6, space_after=8) for t in bs])
-    if i < 2:
-        s.arrow(x + cw2 + 0.08, y + hh / 2, x + cw2 + gap - 0.08, y + hh / 2, color=MUT, lw=2)
-s.text(MX + cw2 + 0.02, 8.25, gap + 0.1, 0.3, [para("residuos", size=11, color=MUT, align="c", space_after=0)])
-s.text(MX + 2 * cw2 + gap + 0.02, 8.25, gap + 0.1, 0.3,
-       [para("blend", size=11, color=MUT, align="c", space_after=0)])
-s.pill((W - 12.0) / 2, 8.62, 12.0, 0.74,
-       "Pronóstico mensual por SKU  ·  Top 100 productos  ·  WAPE 16,10 %", fill=AZUL, size=15.5)
-s.text(MX, 9.55, CW, 0.4,
-       [para("Cada capa resuelve un problema distinto: inercia → comercialidad → intermitencia.",
-             size=14, color=GRAY, align="c", space_after=0, italic=True)])
+    s.text(x + 0.34, ty + 0.62, wd - 0.68, 0.42,
+           [para(tit, size=15, bold=True, color=INK, space_after=0, line=1.1)])
+    s.text(x + 0.34, ty + 1.12, wd - 0.68, th - 1.25,
+           [b(t, size=12.6, space_after=5, indent=0.24) for t in bs])
+for x in (MX + 3.45, MX + 10.65, MX + 16.15):
+    s.vline(x, ty + th + 0.04, 0.16, color=MUT, lw=1.5)
+s.hline(MX + 3.45, ty + th + 0.20, 12.70, color=MUT, lw=1.5)
+s.arrow(10.0, ty + th + 0.20, 10.0, 6.06, color=MUT, lw=1.6)
+s.pill((W - 8.4) / 2, 6.10, 8.4, 0.55, "6 predicciones candidatas por familia", fill=LIGHT2, color=INK, size=14.5)
+s.arrow(10.0, 6.68, 10.0, 6.88, color=MUT, lw=1.6)
+s.banner(MX, 6.95, CW, 0.82,
+         "VALIDACIÓN  ·  Ponderación NNLS y búsqueda en grilla: se fija el peso de cada modelo y el umbral "
+         "de ruteo minimizando el WAPE", fill=AZUL, size=14.5)
+s.arrow(10.0, 7.85, 10.0, 8.05, color=MUT, lw=1.6)
+s.pill((W - 10.5) / 2, 8.10, 10.5, 0.55, "Demanda proyectada por familia  ·  WAPE 12,89 %",
+       fill="E8EEF3", color=AZUL_D, size=14.5)
+s.arrow(10.0, 8.72, 10.0, 8.92, color=MUT, lw=1.6)
+s.rect(MX, 8.97, CW, 0.62, fill=LIGHT, line=LINE, radius=0.05)
+s.text(MX + 0.4, 8.97, CW - 0.8, 0.62,
+       [para("CAPA 3  ·  los mismos modelos estiman la cuota de cada SKU dentro de su familia → "
+             "desagregación top-down", size=14, bold=True, color=INK, align="c", space_after=0)], valign="m")
+s.arrow(10.0, 9.64, 10.0, 9.82, color=MUT, lw=1.6)
+s.text(MX, 9.85, CW, 0.4, [para("Pronóstico por SKU  ·  Top 100  ·  WAPE 16,10 %", size=15, bold=True,
+                                color=AZUL, align="c", space_after=0)])
 
-# ═══════════════════════════ 13 · CAPA 1 ═══════════════════════════
-s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Capa 1  ·  Desacoplamiento estructural")
-c1 = [("Objetivo", ROJO, "Capturar la inercia, el nivel base y la estacionalidad estructural de cada una "
-                         "de las 58 familias comerciales, donde la serie es continua y tiene señal."),
-      ("Método", AMAR, "Suavizamiento exponencial Holt amortiguado. El amortiguamiento frena la "
-                       "extrapolación de la tendencia y evita proyecciones explosivas en horizontes largos."),
-      ("Qué delega", AZUL, "Todo evento disruptivo —promociones, liquidaciones, campañas— queda deliberadamente "
-                           "en el residuo, para que lo explique la Capa 2 con información comercial.")]
-for i, (t, col, txt) in enumerate(c1):
-    s.card(MX + i * 6.08, CT, 5.73, 2.95, t, [para(txt, size=14.5, color=TXT, space_after=0, line=1.26)],
-           accent=col, tsize=18)
-s.card(MX, CT + 3.25, CW, 2.15, "Por qué empezar por aquí",
-       [para("Pedirle a un árbol de decisión que aprenda el nivel de una serie es gastar capacidad de modelo "
-             "en algo que una ecuación de suavizamiento hace mejor y con menos varianza. Al retirar el nivel, "
-             "el problema que queda —el residuo— es justamente donde la información comercial es decisiva.",
-             size=15, color=TXT, space_after=0, line=1.28)], accent=INK)
-s.banner(MX, CT + 5.75, CW, 1.15,
-         "Resultado de la capa: una señal base estable sobre la que el aprendizaje automático solo tiene que "
-         "explicar desviaciones.", fill=LIGHT2, color=TXT, size=15, bold=False)
+# ═══════════════════════════ 14 · CAPAS 1 Y 2 ═══════════════════════════
+s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Capas 1 y 2 · Por qué entrenar dos veces lo mismo")
+s.rect(MX, CT, 9.4, 5.0, fill=WHITE, line=LINE, radius=0.06)
+s.image(f"{C}/tracks.png", MX + 0.3, CT + 0.25, 8.8, 4.5)
+s.caption(MX, CT + 5.15, 9.4, "Comportamiento esperado de cada track frente a la demanda real.")
+s.card(MX + 10.0, CT, 7.9, 2.4, "Capa 1 · sin suavizamiento",
+       [b("Los modelos ven la serie tal cual, en escala arcsinh.", size=13.6),
+        b("Reacciona rápido a shocks comerciales, pero hereda el ruido: mayor varianza.",
+          size=13.6, space_after=0)], accent=ROJO, tsize=17)
+s.card(MX + 10.0, CT + 2.7, 7.9, 2.45, "Capa 2 · con suavizamiento",
+       [b("Holt amortiguado extrae el nivel base y los modelos trabajan en escala relativa a ese nivel.",
+          size=13.6),
+        b("Filtra ruido y conserva estacionalidad: menor varianza, pero reacciona más tarde.",
+          size=13.6, space_after=0)], accent=AMAR, tsize=17)
+s.banner(MX, CT + 5.7, CW, 1.85,
+         "La clave es la diversificación de errores: cuando el mercado gira, la Capa 1 llega antes; cuando "
+         "hay ruido, la Capa 2 no se deja arrastrar. Sus errores no están correlacionados, y por eso la "
+         "combinación pondera mejor que cualquiera de los dos por separado.", fill=AZUL, size=16)
 
-# ═══════════════════════════ 14 · CAPA 2 ═══════════════════════════
-s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Capa 2  ·  Proyección de residuos comerciales")
-s.card(MX, CT, 8.6, 2.5, "El objetivo",
-       [para("Modelar el residuo de la Capa 1: la parte de la demanda que la inercia no explica. Ahí es "
-             "donde vive el efecto de las palancas comerciales sobre la venta.",
-             size=14.5, color=TXT, space_after=0, line=1.26)], accent=ROJO)
-s.card(MX + 9.3, CT, 8.6, 2.5, "Las palancas que entran al modelo",
-       [b("Precio promedio proyectado ex-ante del mes t"),
-        b("Descuento comercial planificado"),
-        b("Rezagos, ventanas móviles y estacionalidad armónica", space_after=0)], accent=AMAR)
-s.text(MX, CT + 2.85, CW, 0.42, [para("BANCO DE MODELOS DEL ENSAMBLE", size=13, bold=True, color=GRAY,
-                                      space_after=0, spc=2.2)])
-models = [("XGBoost", "boosting por gradiente"), ("LightGBM", "boosting histogramado"),
-          ("CatBoost", "boosting ordenado"), ("TabPFN", "modelo fundacional tabular")]
-for i, (m, det) in enumerate(models):
-    x = MX + i * 4.53
-    s.rect(x, CT + 3.35, 4.28, 1.6, fill=LIGHT, line=LINE, radius=0.06)
-    s.text(x, CT + 3.35, 4.28, 1.6, [para(m, size=18, bold=True, color=AZUL, align="c", space_after=3),
-                                     para(det, size=12.5, color=GRAY, align="c", space_after=0)], valign="m")
-s.card(MX, CT + 5.25, CW, 2.3, "Tratamiento numérico",
-       [para("Los residuos se modelan en escala arcsinh —que absorbe magnitudes extremas sin descartar el "
-             "signo— con ponderación temporal decreciente (decay de 24 meses) para privilegiar el "
-             "comportamiento comercial reciente. Modelos distintos fallan distinto: el ensamble promedia "
-             "errores no correlacionados.", size=14.2, color=TXT, space_after=0, line=1.24)], accent=AZUL)
+# ═══════════════════════════ 15 · PESOS ═══════════════════════════
+s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Cómo se combinan: pesos calibrados en validación")
+s.card(MX, CT, 5.73, 3.5, "Ponderación NNLS",
+       [b("Mínimos cuadrados no negativos: pesos mayores o iguales a cero que suman exactamente 1.",
+          size=13.6),
+        b("Ningún modelo puede entrar con signo invertido ni dominar por construcción.",
+          size=13.6, space_after=0)], accent=ROJO, tsize=17.5)
+s.card(MX + 6.08, CT, 5.73, 3.5, "Búsqueda en grilla",
+       [b("Se evalúa una grilla de umbrales de momentum entre 1,05 y 1,50.", size=13.6),
+        b("Para cada valor se reoptimizan los pesos de ruteo y se elige la combinación que minimiza el "
+          "WAPE en validación.", size=13.6, space_after=0)], accent=AMAR, tsize=17.5)
+s.card(MX + 12.17, CT, 5.73, 3.5, "Ruteo por régimen",
+       [b("Indicador de momentum: media móvil de 3 meses sobre media móvil de 12.", size=13.6),
+        b("Si la familia acelera, pesa más el componente de nivel dinámico; si está madura, la señal "
+          "conservadora.", size=13.6, space_after=0)], accent=AZUL, tsize=17.5)
+s.text(MX, CT + 3.85, CW, 0.4, [para("GRILLA DE UMBRALES EVALUADA EN VALIDACIÓN", size=12.5, bold=True,
+                                     color=GRAY, space_after=0, spc=2)])
+taus = ["1,05", "1,15", "1,25", "1,35", "1,50"]
+gw = 2.6
+for i, t in enumerate(taus):
+    x = MX + i * (gw + 0.35)
+    sel = i == 2
+    s.rect(x, CT + 4.35, gw, 1.0, fill=(AZUL if sel else LIGHT), line=(None if sel else LINE), radius=0.05)
+    s.text(x, CT + 4.35, gw, 1.0, [para(t, size=17, bold=True, color=(WHITE if sel else GRAY),
+                                        align="c", space_after=0)], valign="m")
+s.text(MX + 2 * (gw + 0.35), CT + 5.45, gw, 0.35,
+       [para("τ* seleccionado", size=12, bold=True, color=AZUL, align="c", space_after=0)])
+s.text(MX + 15.0, CT + 4.35, 2.9, 1.0,
+       [para("...para cada umbral se reoptimizan los pesos", size=12.5, color=MUT, space_after=0, line=1.2)],
+       valign="m")
+s.banner(MX, CT + 6.0, CW, 1.55,
+         "Esto es lo que da sostenibilidad en el tiempo: los pesos no son una constante del modelo, son un "
+         "parámetro recalibrable. Si cambia la estructura del mercado, la recalibración reasigna peso hacia "
+         "los modelos que mejor capturan el nuevo régimen, sin rediseñar la arquitectura.",
+         fill=AZUL, size=16)
 
-# ═══════════════════════════ 15 · CAPA 3 ═══════════════════════════
-s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Capa 3  ·  Integración y desagregación jerárquica")
-c3 = [("Ruteo dinámico por momentum", ROJO,
-       "Los pesos del ensamble se optimizan por NNLS en validación. Si el momentum trimestral de la familia "
-       "supera el umbral τ* (calibrado entre 1,05 y 1,50), el sistema conmuta hacia el componente de aprendizaje automático; "
-       "si la categoría está estable, pesa más la señal inercial."),
-      ("Desagregación top-down", AMAR,
-       "La predicción de familia se reparte a cada SKU con proporciones históricas del período de "
-       "entrenamiento, garantizando coherencia jerárquica exacta: las partes suman el total."),
-      ("Por qué resuelve la intermitencia", AZUL,
-       "Arriba, la serie agregada es continua y tiene estacionalidad clara; abajo, el reparto proporcional "
-       "distribuye ese pronóstico limpio. El 30,3 % de ceros deja de ser un problema de modelado.")]
-for i, (t, col, txt) in enumerate(c3):
-    s.card(MX + i * 6.08, CT, 5.73, 3.45, t, [para(txt, size=14.3, color=TXT, space_after=0, line=1.26)],
-           accent=col, tsize=17.5)
-s.card(MX, CT + 3.75, CW, 2.0, "Decisión experimental documentada",
-       [para("Se probó también una desagregación supervisada con cuotas dinámicas aprendidas (learned "
-             "shares): obtuvo 24,35 % de WAPE frente al 16,10 % del reparto estático. En catálogos muy "
-             "intermitentes, la estabilidad de las proporciones históricas vence a la sofisticación.",
-             size=14.5, color=TXT, space_after=0, line=1.26)], accent=INK)
-s.banner(MX, CT + 6.05, CW, 1.0,
-         "Pronosticar bien la familia y repartir bien el SKU venció a todos los modelos que pronostican "
-         "el SKU directamente.", fill=AZUL, size=15.5)
+# ═══════════════════════════ 16 · CAPA 3 ═══════════════════════════
+s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Capa 3 · De la familia al SKU: desagregación top-down")
+s.rect(MX, CT, 8.6, 3.15, fill=LIGHT, radius=0.06)
+s.rect(MX + 0.45, CT + 1.05, 2.5, 0.95, fill=AZUL, radius=0.06)
+s.text(MX + 0.45, CT + 1.05, 2.5, 0.95, [para("Familia", size=15, bold=True, color=WHITE, align="c",
+                                             space_after=2),
+                                        para("demanda proyectada", size=11, color="CBDCE7", align="c",
+                                             space_after=0)], valign="m")
+skus = [("SKU A", "41 %"), ("SKU B", "27 %"), ("SKU C", "19 %"), ("SKU D", "13 %")]
+for i, (k, pc) in enumerate(skus):
+    y = CT + 0.30 + i * 0.60
+    s.rect(MX + 4.6, y, 3.5, 0.55, fill=WHITE, line=LINE, radius=0.05)
+    s.text(MX + 4.85, y, 1.6, 0.55, [para(k, size=13, bold=True, color=INK, space_after=0)], valign="m")
+    s.text(MX + 6.3, y, 1.6, 0.55, [para(pc, size=13, bold=True, color=AZUL, align="r", space_after=0)],
+           valign="m")
+    s.arrow(MX + 3.05, CT + 1.52, MX + 4.5, y + 0.27, color=MUT, lw=1.2)
+s.caption(MX + 0.45, CT + 2.68, 7.7,
+          "La cuota de cada SKU reparte la demanda de su familia; las cuotas suman exactamente 100 %.")
+s.card(MX + 9.3, CT, 8.6, 3.15, "Qué predice esta capa",
+       [b("No la demanda del SKU, sino su participación dentro de la familia.", size=13.8),
+        b("La demanda familiar se multiplica por esa cuota y se obtiene el pronóstico del producto.",
+          size=13.8),
+        b("Restringido al catálogo estratégico: las cuotas se normalizan sobre el Top 100 de cada familia.",
+          size=13.8, space_after=0)], accent=AZUL, tsize=17.5)
+s.card(MX, CT + 3.45, 8.6, 3.0, "Vía A · proporciones históricas",
+       [b("La cuota se calcula con las ventas del período de entrenamiento y se mantiene fija en el test.",
+          size=13.6),
+        b("Es el esquema que usan todos los modelos comparados: garantiza una comparación justa.",
+          size=13.6),
+        b("Resultado principal de la tesis: WAPE 16,10 %.", size=13.6, bold=True, space_after=0)],
+       accent=AMAR, tsize=17)
+s.card(MX + 9.3, CT + 3.45, 8.6, 3.0, "Vía B · cuotas supervisadas (dinámicas)",
+       [b("LightGBM, XGBoost y CatBoost predicen la cuota mes a mes con la historia que va surgiendo.",
+          size=13.6),
+        b("Variables: cuota rezagada en t−1 y t−12, medias móviles de 3 y 12 meses, meses desde la última "
+          "venta y precio relativo del SKU frente a su familia.", size=13.6),
+        b("Extensión metodológica evaluada: WAPE 24,35 %.", size=13.6, bold=True, space_after=0)],
+       accent=AZUL, tsize=17)
+s.banner(MX, CT + 6.75, CW, 0.8,
+         "Hallazgo: en catálogos con alta intermitencia, la estabilidad de las proporciones históricas venció "
+         "a la sofisticación de las cuotas aprendidas.", fill=LIGHT2, color=TXT, size=15, bold=False)
 
 # ═══════════════════════════ 16 · BENCHMARK ═══════════════════════════
 s = S("05", "RESULTADOS Y EVIDENCIA", "Benchmark fuera de muestra: febrero – agosto 2025")
@@ -646,87 +717,86 @@ s.banner(MX, CT + 5.75, CW, 1.7,
 
 # ═══════════════════════════ NOTAS DEL ORADOR ═══════════════════════════
 NOTAS = {
-1: "45 s. Saludo: buenos días, mi nombre es Joaquín Mondaca y presento la memoria "
-   "«Pronóstico Jerárquico de Demanda Intermitente en el Retail de Moda Femenina», guiada por el profesor "
-   "Villena y con la profesora Tapia como correferente. En 18 minutos voy a mostrar el problema, la "
-   "arquitectura que propongo, la evidencia y el impacto financiero.",
-2: "30 s. Recorrido en seis bloques. No leer la lámina: anunciar que el bloque 5, resultados, es el centro "
-   "de la presentación y que hay anexos de respaldo al final para las preguntas.",
-3: "1 min 15 s. Tres hechos de la industria que definen el problema: ciclos de 2 a 3 meses, demanda "
-   "dirigida por el plan comercial y compromisos de compra con 3 a 6 meses de anticipación. El gráfico "
-   "muestra la demanda agregada del núcleo comercial: alta volatilidad y caída estructural post-2021. "
-   "Transición: sobre esta serie agregada la señal existe; el problema aparece al bajar al SKU.",
-4: "1 min 30 s. Dato clave: 30,3 % de los pares SKU-mes no registran venta. El mapa de calor muestra 100 "
-   "SKUs por 66 meses; las zonas claras son ceros. No es ruido, es estructura. Croston y SBA fueron "
-   "diseñados para intermitencia sin estacionalidad; SARIMA supone continuidad. Cerrar con el dilema: "
-   "sobre-stock inmoviliza capital, quiebre destruye ingreso y fidelidad.",
-5: "1 min. Leer la pregunta de investigación en voz alta y luego H0/H1. Enfatizar que la hipótesis se "
-   "operacionaliza con WAPE y que los benchmarks primarios son SARIMA, SARIMAX y LSTM; Croston, SBA, "
-   "Seasonal Naïve y Chronos-Bolt entran como referencias de frontera.",
-6: "1 min. Justificar el foco: Top 100 SKUs y 58 familias concentran 72 % del volumen y 78 % del margen. "
-   "Punto crítico anti-leakage: el Top 100 se selecciona solo con datos previos al corte, no con el "
-   "período de prueba. Mostrar la jerarquía de agregación de departamento a SKU.",
-7: "50 s. Tres grupos de variables. La distinción importante: el plan comercial (precio y descuento) es "
-   "ex-ante porque lo decide la empresa antes del mes; el resto de la información va rezagada en t-1. "
-   "Si el jurado pregunta por leakage, esta es la lámina para volver.",
-8: "1 min. Declarar supuestos antes de mostrar resultados: venta cero con inventario = demanda cero; "
-   "target son ventas observadas, no demanda latente. Y declarar la asimetría metodológica: las líneas "
-   "base usan parametrización parsimoniosa estándar, sin auto-ARIMA por SKU. Esto anticipa una pregunta "
-   "probable del jurado.",
-9: "50 s. Por qué WAPE: el MAPE se indetermina con ceros. Ejemplo concreto del propio benchmark: SARIMA "
-   "tiene sMAPE de 309,88 % y WAPE de 76,74 %. El WAPE pondera por volumen físico, que es la unidad de "
-   "decisión de inventario.",
-10: "1 min. Partición 80/10/10 estrictamente cronológica; calibración congelada en enero de 2025 y siete "
-    "meses de prueba ciega (febrero a agosto de 2025). Recalcar: pesos congelados, sin reajustar durante "
-    "el test. Esto es lo que hace creíble el resultado.",
-11: "40 s. La batería de referencia cubre desde Seasonal Naïve y SARIMA hasta LSTM y modelos "
-    "fundacionales de 2024. Todos evaluados con la misma ventana, jerarquía y métrica.",
-12: "2 min. Lámina central. Recorrer el flujo: la serie agregada de familia entra a la Capa 1 (Holt "
-    "amortiguado, inercia); lo que queda son residuos que la Capa 2 explica con el ensamble GBDT más "
-    "TabPFN y las señales de precio; la Capa 3 integra ambas con ruteo por momentum y desagrega top-down "
-    "a SKU. Frase de cierre: cada capa resuelve un problema distinto.",
-13: "50 s. Capa 1. La idea de fondo: no gastar capacidad del modelo de árboles en aprender el nivel, que "
-    "una ecuación de suavizamiento estima mejor y con menos varianza.",
-14: "1 min. Capa 2. El ensamble modela el residuo. Cuatro modelos porque fallan de forma distinta y el "
-    "promedio ponderado por NNLS reduce el error. Escala arcsinh y decay de 24 meses para privilegiar el "
-    "comportamiento comercial reciente.",
-15: "1 min 15 s. Capa 3. Ruteo por momentum: si la categoría acelera, pesa más el aprendizaje automático. "
-    "Desagregación con proporciones históricas. Mencionar la honestidad experimental: las cuotas "
-    "aprendidas dieron 24,35 %, peor que el reparto estático de 16,10 %.",
-16: "2 min. Resultado principal. Leer de abajo hacia arriba: Croston 84,87 %, SARIMA 76,74 %, Seasonal "
-    "Naïve 69,89 %, LSTM 45,75 %, Chronos-Bolt 48,44 % y ES-GBM 16,10 %. A nivel familia, 12,89 %. "
-    "Pausa después del número: es el corazón de la defensa.",
-17: "1 min. El pronóstico sigue la trayectoria real en los siete meses. R² de 0,95 a nivel SKU y 0,96 a "
-    "nivel familia; sesgo de −4,8 %, es decir, sub-predicción leve y sistemática, que es corregible y "
-    "operacionalmente preferible a sobre-predecir.",
-18: "1 min 30 s. Ablación: sin precios el error sube a 38,25 %; con precio rezagado, 26,42 %; con plan "
-    "ex-ante, 16,10 %. Conclusión conceptual: la demanda del fast fashion no es estocástica, la dirige el "
-    "plan comercial. Matiz honesto: la importancia por ganancia del 67 % no es una estimación causal de "
-    "elasticidad precio.",
-19: "1 min 30 s. Traducción a negocio: pasar de MAE 54,2 a 11,4 unidades por SKU reduce el stock de "
-    "seguridad de 8.916 a 1.875 unidades. Eso son 7.041 unidades, 105,6 millones de pesos de capital "
-    "liberado y 23,2 millones anuales de ahorro en holding. Declarar de inmediato que es un ejercicio "
-    "ilustrativo de orden de magnitud con MAE como proxy.",
-20: "1 min 15 s. Cuatro conclusiones. La contribución no es un algoritmo nuevo: es una arquitectura que "
+1: "45 s. Saludo: mi nombre es Joaquín Mondaca y presento la memoria «Pronóstico Jerárquico de Demanda "
+   "Intermitente en el Retail de Moda Femenina», guiada por el profesor Villena y con la profesora Tapia "
+   "como correferente. En 18 minutos: problema, arquitectura, evidencia e impacto financiero.",
+2: "30 s. Recorrido en seis bloques. Anunciar que el bloque 5, resultados, es el centro, y que hay siete "
+   "anexos de respaldo para las preguntas.",
+3: "1 min 15 s. Tres hechos de la industria: ciclos de 2 a 3 meses, demanda dirigida por el plan comercial "
+   "y compromisos de compra con 3 a 6 meses de anticipación. El gráfico muestra la demanda agregada del "
+   "núcleo comercial. Transición: en la serie agregada la señal existe; el problema aparece al bajar al SKU.",
+4: "1 min 30 s. 30,3 % de los pares SKU-mes no registran venta. El mapa de calor son 100 SKUs por 66 meses; "
+   "las zonas claras son ceros. No es ruido, es estructura. Croston y SBA suponen intermitencia sin "
+   "estacionalidad, SARIMA supone continuidad. Cerrar con el dilema: sobre-stock inmoviliza capital, "
+   "quiebre destruye ingreso.",
+5: "1 min. Leer la pregunta y luego H0/H1. La hipótesis se operacionaliza con WAPE. Benchmarks primarios: "
+   "SARIMA, SARIMAX y LSTM; Croston, SBA, Seasonal Naïve y Chronos-Bolt como referencias de frontera.",
+6: "1 min. Top 100 SKUs y 58 familias concentran 72 % del volumen y 78 % del margen. Punto crítico: el Top "
+   "100 se selecciona solo con datos previos al corte, no con el período de prueba.",
+7: "50 s. Tres grupos de variables. La distinción clave: el plan comercial es ex-ante porque lo decide la "
+   "empresa; todo lo demás va rezagado en t-1. Enlaza directo con la Fase 0.",
+8: "1 min. Declarar supuestos antes de los resultados: venta cero con inventario es demanda cero; el target "
+   "son ventas observadas. Y declarar la asimetría metodológica de las líneas base. Esto anticipa una "
+   "pregunta probable del jurado.",
+9: "50 s. Por qué WAPE: el MAPE se indetermina con ceros. Ejemplo del propio benchmark: SARIMA tiene sMAPE "
+   "de 309,88 % y WAPE de 76,74 %. El WAPE pondera por volumen físico, la unidad de decisión de inventario.",
+10: "1 min. Partición 80/10/10 cronológica, calibración congelada en enero de 2025 y siete meses de prueba "
+    "ciega. Recalcar: pesos congelados, sin reajustar durante el test.",
+11: "1 min 30 s. LÁMINA IMPORTANTE: contar que esta fue la etapa donde más tiempo se invirtió. La demanda y "
+    "las variables macro solo se conocen en t-1; la única señal del presente es el plan comercial, porque "
+    "lo fija la empresa. Explicar que fueron decenas de iteraciones: al transformar variables (medias "
+    "móviles, agregaciones) a veces se colaba señal del mes t sin darse cuenta, y cada corrección de rezago "
+    "cambiaba el comportamiento del modelo. Cerrar con la frase del banner: un modelo que ve el futuro "
+    "siempre gana en el papel.",
+12: "40 s. La batería de referencia cubre desde Seasonal Naïve y SARIMA hasta LSTM y modelos fundacionales "
+    "de 2024. Todos con la misma ventana, jerarquía y métrica.",
+13: "2 min 30 s. LÁMINA CENTRAL. Recorrer el flujo de arriba hacia abajo: del panel auditado en Fase 0 salen "
+    "dos tracks paralelos. La Capa 1 entrena XGBoost, LightGBM y CatBoost sobre la serie directa en escala "
+    "arcsinh: reactiva, más volátil. La Capa 2 entrena LightGBM y CatBoost sobre la serie relativa al nivel "
+    "que extrae el Holt amortiguado: más estable. Sumando TabPFN son seis predicciones candidatas por "
+    "familia. Esas seis entran a validación, donde se fija el peso de cada una. Con esos pesos se obtiene "
+    "la demanda de familia y recién ahí entra la Capa 3, que desagrega a SKU.",
+14: "1 min 15 s. Explicar por qué se entrena dos veces: no es redundancia, es diversificación de errores. "
+    "El track sin suavizar llega antes cuando el mercado gira; el suavizado no se deja arrastrar por el "
+    "ruido. Como sus errores no están correlacionados, la combinación pondera mejor que cualquiera solo. "
+    "Aclarar que el gráfico es un esquema ilustrativo del comportamiento, no datos del modelo.",
+15: "1 min 30 s. Aquí está el argumento de sostenibilidad. Los pesos salen de NNLS (no negativos y suman 1) "
+    "y la calibración se hace con una búsqueda en grilla sobre validación: se recorre la grilla de umbrales "
+    "de momentum entre 1,05 y 1,50 y para cada valor se reoptimizan los pesos, quedándose con la "
+    "combinación que minimiza el WAPE. La consecuencia práctica: si la industria cambia de comportamiento, "
+    "la recalibración reasigna peso a los modelos que capturan mejor el nuevo régimen, sin rediseñar nada.",
+16: "1 min 30 s. La Capa 3 no predice demanda: predice la cuota de cada SKU dentro de su familia. Presentar "
+    "las dos vías con seguridad. La vía A usa proporciones históricas y es la que entrega el resultado "
+    "principal de 16,10 %, porque es el mismo esquema que usan todos los benchmarks y eso garantiza una "
+    "comparación justa. La vía B es el motor supervisado que estima la cuota mes a mes con la historia que "
+    "va surgiendo, con cuota rezagada, medias móviles, meses sin venta y precio relativo. Dio 24,35 %. "
+    "El hallazgo es interesante: en catálogos muy intermitentes la estabilidad le gana a la sofisticación.",
+17: "2 min. Resultado principal. Leer de abajo hacia arriba: Croston 84,87 %, SARIMA 76,74 %, Seasonal Naïve "
+    "69,89 %, Chronos-Bolt 48,44 %, LSTM 45,75 % y ES-GBM 16,10 %. A nivel familia, 12,89 %. Pausa después "
+    "del número.",
+18: "1 min. El pronóstico sigue la trayectoria real en los siete meses. R2 de 0,95 a nivel SKU y 0,96 a "
+    "nivel familia; sesgo de -4,8 %, sub-predicción leve, sistemática y corregible.",
+19: "1 min 30 s. Ablación: sin precios 38,25 %, con precio rezagado 26,42 %, con plan ex-ante 16,10 %. La "
+    "demanda del fast fashion no es estocástica, la dirige el plan comercial. Matiz honesto: la importancia "
+    "por ganancia del 67 % no es una estimación causal de elasticidad precio.",
+20: "1 min 30 s. Traducción a negocio: pasar de MAE 54,2 a 11,4 unidades por SKU baja el stock de seguridad "
+    "de 8.916 a 1.875 unidades. Son 7.041 unidades, 105,6 millones de capital liberado y 23,2 millones "
+    "anuales de ahorro. Declarar de inmediato que es un ejercicio ilustrativo de orden de magnitud.",
+21: "1 min 15 s. Cuatro conclusiones. La contribución no es un algoritmo nuevo: es una arquitectura que "
     "asigna cada problema al método que mejor lo resuelve, bajo un protocolo que impide explicar el "
     "resultado por fuga de información.",
-21: "1 min. Limitaciones primero, con seguridad: horizonte de un mes, un solo retailer, ventana de prueba "
-    "sin el peak de noviembre-diciembre, ejercicio financiero ilustrativo. Luego trabajo futuro: "
-    "fine-tuning de modelos fundacionales, desagregación con deep learning y cola larga del catálogo.",
-22: "Cierre. Agradecer al profesor guía, a la profesora correferente y a la empresa por los datos. "
-    "Quedar en silencio y esperar preguntas. Los anexos A1 a A7 están listos para respaldar respuestas.",
-23: "Anexo A1. Tabla 5.1 completa: WAPE, sMAPE, RMSE, MAE, sesgo, R² y ranking en ambos niveles.",
-24: "Anexo A2. Comparativa visual de seis arquitecturas contra la demanda real.",
-25: "Anexo A3. Residuos: Ljung-Box con p = 0,751 y Shapiro-Wilk con p = 0,184. Usar si preguntan por "
-    "supuestos estadísticos.",
-26: "Anexo A4. Evidencia de intermitencia: matriz completa y un SKU con 62 % de meses en cero.",
-27: "Anexo A5. Matriz de sensibilidad financiera: rango de 84,5 a 126,8 millones bajo gestión "
-    "descentralizada y de 8,5 a 12,7 millones con risk pooling. Usar si cuestionan el supuesto de "
-    "agregación.",
-28: "Anexo A6. Contexto macro: el IPC de vestuario cae de forma sostenida. Estacionalidad repartida entre "
-    "las cuatro estaciones.",
-29: "Anexo A7. Protocolo de verificación y uso declarado de herramientas de IA. Tenerlo presente: es una "
-    "pregunta cada vez más frecuente en defensas.",
+22: "1 min. Limitaciones primero y con seguridad: horizonte de un mes, un solo retailer, ventana sin el peak "
+    "de noviembre-diciembre, ejercicio financiero ilustrativo. Luego trabajo futuro.",
+23: "Cierre. Agradecer al profesor guía, a la profesora correferente y a la empresa por los datos. Silencio "
+    "y esperar preguntas. Los anexos A1 a A7 respaldan las respuestas.",
+24: "Anexo A1. Tabla 5.1 completa: WAPE, sMAPE, RMSE, MAE, sesgo, R2 y ranking en ambos niveles.",
+25: "Anexo A2. Comparativa visual de seis arquitecturas contra la demanda real.",
+26: "Anexo A3. Residuos: Ljung-Box p = 0,751 y Shapiro-Wilk p = 0,184. Usar si preguntan por supuestos.",
+27: "Anexo A4. Evidencia de intermitencia: matriz completa y un SKU con 62 % de meses en cero.",
+28: "Anexo A5. Sensibilidad financiera: 84,5 a 126,8 millones bajo gestión descentralizada y 8,5 a 12,7 "
+    "millones con risk pooling. Usar si cuestionan el supuesto de agregación.",
+29: "Anexo A6. Contexto macro: el IPC de vestuario cae de forma sostenida. Estacionalidad repartida.",
+30: "Anexo A7. Protocolo de verificación y uso declarado de herramientas de IA.",
 }
 for i, sl in enumerate(d.slides, 1):
     if i in NOTAS:
