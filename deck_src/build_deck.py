@@ -8,6 +8,7 @@ from engine import (Deck, para, W, H, MX, CW, CT, CB, EYE_Y, TIT_Y, RULE_Y,
 A = "/home/user/work/assets"
 F = "/home/user/work/fig"
 C = "/home/user/work/charts"
+FM = "/home/user/work/formulas"
 
 LOGO      = f"{A}/image1.png"
 FORMULA   = f"{A}/image5.png"
@@ -59,6 +60,29 @@ def tabla_bt(sl, x, y, w, cols, rows, rowh=0.86, fsize=12.6):
             sl.hline(x, yy, w, color="EAEDF0", lw=0.6)
     sl.hline(x, yy, w, color=INK, lw=1.7)
     return yy
+
+
+def metrica(sl, x, w, abbr, nombre, img, simbolos, lectura, col):
+    sl.text(x, CT, w, 0.5, [para(abbr, size=20, bold=True, color=col, space_after=2)])
+    sl.text(x, CT + 0.48, w, 0.4, [para(nombre, size=13, color=GRAY, space_after=0)])
+    sl.rect(x, CT + 0.90, w, 1.55, fill=WHITE, line=LINE, radius=0.05)
+    sl.image(f"{FM}/{img}.png", x + 0.35, CT + 1.02, w - 0.7, 1.31)
+    sl.text(x, CT + 2.58, w, 0.35, [para("QUÉ SIGNIFICA CADA SÍMBOLO", size=11, bold=True, color=GRAY,
+                                         space_after=0, spc=1.6)])
+    yy = CT + 2.92
+    sl.hline(x, yy, w, color=INK, lw=1.1)
+    for k, (sym, txt) in enumerate(simbolos):
+        yy2 = yy + 0.06 + k * 0.50
+        sl.text(x + 0.05, yy2, 1.2, 0.44,
+                [para(sym, size=14.5, bold=True, color=INK, align="c", space_after=0)], valign="m")
+        sl.text(x + 1.4, yy2, w - 1.5, 0.44,
+                [para(txt, size=12.8, color=TXT, space_after=0, line=1.18)], valign="m")
+        if k < len(simbolos) - 1:
+            sl.hline(x, yy2 + 0.44, w, color="EAEDF0", lw=0.6)
+    yfin = yy + 0.06 + len(simbolos) * 0.50
+    sl.hline(x, yfin, w, color=INK, lw=1.1)
+    sl.card(x, yfin + 0.26, w, 10.02 - (yfin + 0.26), "Cómo se lee",
+            [para(lectura, size=12.7, color=TXT, space_after=0, line=1.2)], accent=col, tsize=15.5, pad=0.32)
 
 
 # ═══════════════════════════ 1 · PORTADA ═══════════════════════════
@@ -125,7 +149,7 @@ for i, (lab, val) in enumerate([("Primavera", "31 %"), ("Verano", "25 %"), ("Inv
     s.rect(x, 8.42, 2.2, 1.05, fill=WHITE, line=LINE, radius=0.05)
     s.text(x, 8.42, 2.2, 1.05, [para(val, size=20, bold=True, color=AZUL, align="c", space_after=1),
                                 para(lab, size=12, color=GRAY, align="c", space_after=0)], valign="m")
-s.caption(9.65, 9.55, 9.3, "Participación de cada estación en la demanda anual (waffle, anexo A8).")
+s.caption(9.65, 9.55, 9.3, "Participación de cada estación en la demanda anual (waffle, anexo A11).")
 
 # ═══════════════════════════ 4 · EL PROBLEMA ═══════════════════════════
 s = S("01", "CONTEXTO Y PROBLEMA", "Series que prenden y se apagan: demanda intermitente")
@@ -719,18 +743,115 @@ s.banner(MX, yfin2 + 0.42, CW, 0.85,
          "que la validación decida el peso.", fill=AZUL, size=15)
 
 s = ANEXO("A3", "Comparativa consolidada de desempeño (Tabla 5.1)")
-s.rect(MX, CT, CW, 6.7, fill=WHITE, line=LINE, radius=0.06)
-s.image(TABLA51, MX + 0.4, CT + 0.3, 17.1, 6.1)
-s.caption(MX, CT + 6.85, CW, "Métricas completas fuera de muestra (feb–ago 2025) para los diez modelos "
-                             "evaluados, en los niveles SKU y familia.")
+t51 = [(6.4, "Modelo / arquitectura", "l"), (1.7, "WAPE", "r"), (1.9, "sMAPE", "r"), (1.6, "RMSE", "r"),
+       (1.5, "MAE", "r"), (1.7, "Bias", "r"), (1.4, "R²", "r"), (1.7, "Ranking", "r")]
+panelA = [("ES-GBM (Static Top-Down)", "16,10 %", "20,47 %", "26,7", "11,4", "−4,8 %", "0,95", "1°", True),
+          ("ES-GBM (Learned Dynamic Share)", "24,35 %", "28,90 %", "41,2", "17,2", "−5,2 %", "0,79", "2°", False),
+          ("LSTM Recurrente (con precio ex-ante)", "45,75 %", "52,10 %", "64,1", "32,3", "+8,4 %", "0,55", "3°", False),
+          ("Chronos-Bolt Desagregado (Static Share)", "48,44 %", "70,69 %", "65,1", "34,2", "+5,6 %", "0,72", "4°", False),
+          ("LSTM Recurrente (sin precio ex-ante)", "53,76 %", "61,40 %", "68,1", "38,1", "+11,2 %", "0,38", "5°", False),
+          ("Seasonal Naïve (benchmark del año anterior)", "69,89 %", "88,17 %", "107,2", "49,4", "+6,3 %", "0,23", "6°", False),
+          ("SARIMAX (con precio y descuento)", "73,24 %", "170,87 %", "122,9", "51,7", "+11,6 %", "−0,01", "7°", False),
+          ("SARIMA Univariado (línea base)", "76,74 %", "309,88 %", "139,6", "54,2", "+14,3 %", "−0,31", "8°", False),
+          ("SBA (Syntetos-Boylan Approximation)", "83,42 %", "95,19 %", "108,1", "58,9", "−4,2 %", "0,22", "9°", False),
+          ("Croston Clásico", "84,87 %", "95,35 %", "108,6", "59,9", "+0,9 %", "0,21", "10°", False)]
+panelB = [("ES-GBM Ensamble Agregado", "12,89 %", "14,67 %", "35,9", "15,7", "−4,8 %", "0,96", "1°", True),
+          ("Chronos-Bolt Agregado (Zero-Shot)", "36,35 %", "61,38 %", "81,9", "44,3", "+5,6 %", "0,79", "2°", False),
+          ("LSTM Recurrente Agregado", "40,51 %", "69,36 %", "88,1", "49,3", "+7,9 %", "0,76", "3°", False),
+          ("SARIMAX Agregado", "59,64 %", "268,31 %", "165,3", "72,6", "+11,6 %", "0,16", "4°", False),
+          ("Seasonal Naïve Agregado", "59,78 %", "84,80 %", "148,9", "72,8", "+6,3 %", "0,32", "5°", False),
+          ("SARIMA Agregado", "64,84 %", "450,19 %", "183,3", "79,0", "+14,3 %", "−0,03", "6°", False)]
+yy = CT
+s.hline(MX, yy, CW, color=INK, lw=1.7)
+cx = MX
+for cw, tit, al in t51:
+    s.text(cx + (0 if al == "l" else 0), yy + 0.10, cw - 0.30, 0.36,
+           [para(tit, size=11, bold=True, color=GRAY, align=al, space_after=0, spc=1.2)])
+    cx += cw
+yy += 0.52
+s.hline(MX, yy, CW, color=INK, lw=0.9)
+for panel, titulo in ((panelA, "PANEL A · MODELOS DESAGREGADOS A NIVEL SKU (TOP 100 PRODUCTOS)"),
+                      (panelB, "PANEL B · MODELOS AGREGADOS A NIVEL FAMILIA (58 FAMILIAS)")):
+    s.text(MX, yy + 0.06, CW, 0.32, [para(titulo, size=10.5, bold=True, color=ROJO, space_after=0, spc=1.2)])
+    yy += 0.40
+    for fila in panel:
+        hero = fila[-1]
+        if hero:
+            s.rect(MX, yy, CW, 0.37, fill="EEF3F7")
+        cx = MX
+        for (cw, _, al), v in zip(t51, fila[:-1]):
+            s.text(cx, yy, cw - 0.30, 0.37,
+                   [para(v, size=11.6, bold=hero, color=(AZUL_D if hero else TXT), align=al, space_after=0)],
+                   valign="m")
+            cx += cw
+        yy += 0.37
+        s.hline(MX, yy, CW, color="EDF0F2", lw=0.5)
+s.hline(MX, yy, CW, color=INK, lw=1.7)
+s.caption(MX, yy + 0.16, CW, "Evaluación fuera de muestra, febrero a agosto de 2025. Las fórmulas de cada "
+                             "métrica están en los anexos A4 a A6.")
 
-s = ANEXO("A4", "Pronóstico vs. demanda real por modelo")
+s = ANEXO("A4", "Métricas de error relativo")
+metrica(s, MX, 8.6, "WAPE", "Weighted Absolute Percentage Error  ·  métrica rectora del estudio", "wape",
+        [("y", "demanda real observada en el mes t, en unidades vendidas"),
+         ("ŷ", "pronóstico del modelo para ese mismo mes"),
+         ("Σ", "suma sobre los n meses del horizonte de evaluación"),
+         ("n", "número de meses evaluados: 7 en la prueba ciega"),
+         ("100 %", "expresa el resultado como porcentaje del volumen vendido")],
+        "Suma todos los errores y los divide por el volumen total vendido: es inmune a la división por "
+        "cero. Un WAPE de 16,10 % significa que el error acumulado equivale al 16,10 % de las unidades "
+        "vendidas.", AZUL)
+s.vline(MX + 8.95, CT, 7.4, color=LINE, lw=0.75)
+metrica(s, MX + 9.3, 8.6, "MAPE", "Mean Absolute Percentage Error  ·  reportado en su variante simétrica",
+        "mape",
+        [("y", "demanda real observada en el mes t"),
+         ("ŷ", "pronóstico del modelo para ese mismo mes"),
+         ("T +", "conjunto de meses con demanda estrictamente positiva"),
+         ("|T +|", "cantidad de esos meses: el promedio se calcula solo sobre ellos")],
+        "Promedia el error relativo mes a mes. Con demanda cero se indetermina y con demanda baja se "
+        "dispara: SARIMA llega a un sMAPE de 309,88 % pese a un WAPE de 76,74 %.", ROJO)
+
+s = ANEXO("A5", "Métricas de escala absoluta")
+metrica(s, MX, 8.6, "MAE", "Mean Absolute Error  ·  error promedio en unidades físicas", "mae",
+        [("y", "demanda real observada en el mes t"),
+         ("ŷ", "pronóstico del modelo para ese mismo mes"),
+         ("| |", "valor absoluto: ignora si el modelo sobrestimó o subestimó"),
+         ("n", "número total de observaciones evaluadas")],
+        "Error promedio expresado en prendas. Alimenta el cálculo del stock de seguridad: 11,4 unidades "
+        "por SKU frente a 54,2 de SARIMA, y esa diferencia es la que libera capital.", AZUL)
+s.vline(MX + 8.95, CT, 7.4, color=LINE, lw=0.75)
+metrica(s, MX + 9.3, 8.6, "RMSE", "Root Mean Squared Error  ·  penaliza los errores grandes", "rmse",
+        [("y", "demanda real observada en el mes t"),
+         ("ŷ", "pronóstico del modelo para ese mismo mes"),
+         ("( )²", "eleva al cuadrado: castiga con más fuerza las desviaciones grandes"),
+         ("raíz", "devuelve el resultado a las unidades originales")],
+        "Al castigar los errores grandes, delata a los modelos que aciertan casi siempre pero fallan feo en "
+        "los peaks de campaña. El ES-GBM obtiene 26,7 unidades frente a 139,6 de SARIMA.", ROJO)
+
+s = ANEXO("A6", "Métricas de calibración y bondad de ajuste")
+metrica(s, MX, 8.6, "Bias", "Sesgo porcentual  ·  hacia qué lado se equivoca el modelo", "bias",
+        [("ŷ − y", "diferencia con signo entre pronóstico y demanda real"),
+         ("+", "sobreestimación sistemática: riesgo de sobre-stock"),
+         ("−", "subestimación sistemática: riesgo de quiebre"),
+         ("Σ y", "volumen total vendido, para expresarlo como porcentaje")],
+        "Un buen modelo combina WAPE bajo con sesgo cercano a cero. El ES-GBM tiene −4,8 %: subestima "
+        "levemente, que en gestión de inventario es el error más barato de los dos.", AMAR_D)
+s.vline(MX + 8.95, CT, 7.4, color=LINE, lw=0.75)
+metrica(s, MX + 9.3, 8.6, "R²", "Coeficiente de determinación  ·  cuánta varianza explica el modelo", "r2",
+        [("y", "demanda real observada en el mes t"),
+         ("ŷ", "pronóstico del modelo para ese mismo mes"),
+         ("media", "demanda promedio del período: la y con barra en la fórmula"),
+         ("1 −", "resta la varianza no explicada sobre la varianza total")],
+        "Proporción de la variabilidad de la demanda que el modelo explica. El ES-GBM alcanza 0,95 a nivel "
+        "SKU y 0,96 a nivel familia; SARIMA queda en terreno negativo, es decir, predice peor que usar el "
+        "promedio.", AZUL)
+
+s = ANEXO("A7", "Pronóstico vs. demanda real por modelo")
 s.rect(MX, CT, CW, 6.9, fill=WHITE, line=LINE, radius=0.06)
 s.image(f"{F}/fig5_1.png", MX + 0.4, CT + 0.3, 17.1, 6.3)
 s.caption(MX, CT + 7.05, CW, "Seis arquitecturas representativas contra la demanda observada del Top 100 "
                              "SKUs en la ventana de prueba.")
 
-s = ANEXO("A5", "Diagnóstico de residuos del modelo propuesto")
+s = ANEXO("A8", "Diagnóstico de residuos del modelo propuesto")
 s.rect(MX, CT, CW, 4.6, fill=WHITE, line=LINE, radius=0.06)
 s.image(f"{F}/fig5_5.png", MX + 0.4, CT + 0.3, 17.1, 4.0)
 s.card(MX, CT + 4.9, 8.75, 2.6, "Qué muestra el diagnóstico",
@@ -742,7 +863,7 @@ s.card(MX + 9.15, CT + 4.9, 8.75, 2.6, "Alcance de la conclusión",
         b("No se afirma homocedasticidad estricta; la evidencia es consistente con un comportamiento "
           "residual adecuado.", space_after=0)], accent=MUT, tsize=17)
 
-s = ANEXO("A6", "Intermitencia: del catálogo completo a un SKU")
+s = ANEXO("A9", "Intermitencia: del catálogo completo a un SKU")
 s.rect(MX, CT, 10.4, 7.05, fill=WHITE, line=LINE, radius=0.06)
 s.image(HEATMAP, MX + 0.3, CT + 0.3, 9.8, 6.15)
 s.caption(MX + 0.3, CT + 6.55, 9.8, "Matriz de demanda: 100 SKUs × 66 meses.")
@@ -755,7 +876,7 @@ s.card(MX + 10.8, CT + 4.0, 7.1, 3.05, "Lectura",
         b("La agregación a familia recupera una señal continua y estacional.", size=13.8, space_after=0)],
        accent=AZUL, tsize=17)
 
-s = ANEXO("A7", "Matriz de sensibilidad del impacto financiero (Tabla 6.1)")
+s = ANEXO("A10", "Matriz de sensibilidad del impacto financiero (Tabla 6.1)")
 rows = [("Conservador", "$12.000", "18 %", "$84,5M CLP", "$15,2M CLP/año", False),
         ("Caso base", "$15.000", "22 %", "$105,6M CLP", "$23,2M CLP/año", True),
         ("Exigente (alta merma)", "$18.000", "26 %", "$126,8M CLP", "$33,0M CLP/año", False)]
@@ -789,7 +910,7 @@ s.card(MX + 9.15, yh + 3.8, 8.75, 1.75, None,
 s.caption(MX, yh + 5.75, CW, "Supuestos: Z = 1,645 (CSL 95 %); SS = Z × MAE × K × raíz(L). Ejercicio ilustrativo "
                              "de orden de magnitud.")
 
-s = ANEXO("A8", "Entorno macro y estacionalidad de la demanda")
+s = ANEXO("A11", "Entorno macro y estacionalidad de la demanda")
 s.rect(MX, CT, 10.6, 5.2, fill=WHITE, line=LINE, radius=0.06)
 s.image(f"{F}/fig2_2.png", MX + 0.35, CT + 0.3, 9.9, 4.6)
 s.caption(MX, CT + 5.35, 10.6, "IPC de vestuario y calzado, serie mensual auditada INE (base 2023 = 100).")
@@ -801,7 +922,7 @@ s.card(MX, CT + 5.9, 10.6, 1.65, None,
              "estaciones, sin un peak único dominante.", size=13.5, color=TXT, space_after=0, line=1.2)],
        accent=AMAR)
 
-s = ANEXO("A9", "Trazabilidad, verificación y uso de herramientas de IA")
+s = ANEXO("A12", "Trazabilidad, verificación y uso de herramientas de IA")
 s.card(MX, CT, 8.75, 5.4, "Mecanismos de verificación",
        [b("Separación cronológica estricta entre entrenamiento, validación y prueba."),
         b("Pruebas automatizadas sobre rezagos y disponibilidad temporal de cada variable."),
@@ -910,14 +1031,21 @@ NOTAS = {
     "cualquier pregunta del tipo por qué no usó tal método o qué diferencia hay entre Croston y SARIMA.",
 25: "Anexo A2. Los componentes de la arquitectura propia y por qué cada uno está donde está. Útil si "
     "preguntan por qué tres GBDT distintos o para qué sirve TabPFN.",
-26: "Anexo A3. Tabla 5.1 completa: WAPE, sMAPE, RMSE, MAE, sesgo, R2 y ranking en ambos niveles.",
-27: "Anexo A4. Comparativa visual de seis arquitecturas contra la demanda real.",
-28: "Anexo A5. Residuos: Ljung-Box p = 0,751 y Shapiro-Wilk p = 0,184. Usar si preguntan por supuestos.",
-29: "Anexo A6. Evidencia de intermitencia: matriz completa y un SKU con 62 % de meses en cero.",
-30: "Anexo A7. Sensibilidad financiera: 84,5 a 126,8 millones bajo gestión descentralizada y 8,5 a 12,7 "
+26: "Anexo A3. Tabla 5.1 completa: WAPE, sMAPE, RMSE, MAE, sesgo, R2 y ranking en los dos niveles de "
+    "agregación. Es la lámina de respaldo para cualquier cifra que pregunten.",
+27: "Anexo A4. Fórmulas de WAPE y MAPE con el significado de cada símbolo. Usar si piden justificar por "
+    "qué el WAPE es la métrica rectora: el MAPE se indetermina con demanda cero.",
+28: "Anexo A5. Fórmulas de MAE y RMSE. El MAE es el que conecta con el cálculo de stock de seguridad; el "
+    "RMSE castiga los errores grandes de los peaks.",
+29: "Anexo A6. Fórmulas de Bias y R2. El sesgo dice hacia qué lado se equivoca el modelo: −4,8 % es "
+    "subestimación leve, que en inventario es el error más barato.",
+30: "Anexo A7. Comparativa visual de seis arquitecturas contra la demanda real.",
+31: "Anexo A8. Residuos: Ljung-Box p = 0,751 y Shapiro-Wilk p = 0,184. Usar si preguntan por supuestos.",
+32: "Anexo A9. Evidencia de intermitencia: matriz completa y un SKU con 62 % de meses en cero.",
+33: "Anexo A10. Sensibilidad financiera: 84,5 a 126,8 millones bajo gestión descentralizada y 8,5 a 12,7 "
     "millones con risk pooling. Usar si cuestionan el supuesto de agregación.",
-31: "Anexo A8. Contexto macro: el IPC de vestuario cae de forma sostenida. Estacionalidad repartida.",
-32: "Anexo A9. Protocolo de verificación y uso declarado de herramientas de IA.",
+34: "Anexo A11. Contexto macro: el IPC de vestuario cae de forma sostenida. Estacionalidad repartida.",
+35: "Anexo A12. Protocolo de verificación y uso declarado de herramientas de IA.",
 }
 for i, sl in enumerate(d.slides, 1):
     if i in NOTAS:
