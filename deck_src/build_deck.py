@@ -31,8 +31,8 @@ def S(eyebrow_num, eyebrow, title, subtitle=None, foot=True):
     return s
 
 
-def b(t, size=14.2, space_after=7, **kw):
-    return para(t, size=size, bullet=True, color=TXT, space_after=space_after, line=1.18, **kw)
+def b(t, size=14.2, space_after=7, color=TXT, **kw):
+    return para(t, size=size, bullet=True, color=color, space_after=space_after, line=1.18, **kw)
 
 
 def tabla_bt(sl, x, y, w, cols, rows, rowh=0.86, fsize=12.6):
@@ -451,45 +451,48 @@ s.banner(MX, CT + 6.0, CW, 1.55,
 
 # ═══════════════════════════ 16 · CAPA 3 ═══════════════════════════
 s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Capa 3 · De la familia al SKU: desagregación top-down")
-s.rect(MX, CT, 8.6, 3.15, fill=LIGHT, radius=0.06)
-s.rect(MX + 0.45, CT + 1.05, 2.5, 0.95, fill=AZUL, radius=0.06)
-s.text(MX + 0.45, CT + 1.05, 2.5, 0.95, [para("Familia", size=15, bold=True, color=WHITE, align="c",
-                                             space_after=2),
-                                        para("demanda proyectada", size=11, color="CBDCE7", align="c",
-                                             space_after=0)], valign="m")
-skus = [("SKU A", "41 %"), ("SKU B", "27 %"), ("SKU C", "19 %"), ("SKU D", "13 %")]
-for i, (k, pc) in enumerate(skus):
-    y = CT + 0.30 + i * 0.60
-    s.rect(MX + 4.6, y, 3.5, 0.55, fill=WHITE, line=LINE, radius=0.05)
-    s.text(MX + 4.85, y, 1.6, 0.55, [para(k, size=13, bold=True, color=INK, space_after=0)], valign="m")
-    s.text(MX + 6.3, y, 1.6, 0.55, [para(pc, size=13, bold=True, color=AZUL, align="r", space_after=0)],
+s.rect(MX, CT, 8.6, 2.55, fill=LIGHT, radius=0.06)
+s.rect(MX + 0.45, CT + 0.78, 2.5, 0.9, fill=AZUL, radius=0.06)
+s.text(MX + 0.45, CT + 0.78, 2.5, 0.9,
+       [para("Familia", size=14.5, bold=True, color=WHITE, align="c", space_after=2),
+        para("demanda proyectada", size=10.5, color="CBDCE7", align="c", space_after=0)], valign="m")
+for i, (k, pc) in enumerate([("SKU A", "41 %"), ("SKU B", "27 %"), ("SKU C", "19 %"), ("SKU D", "13 %")]):
+    y = CT + 0.26 + i * 0.52
+    s.rect(MX + 4.6, y, 3.5, 0.46, fill=WHITE, line=LINE, radius=0.04)
+    s.text(MX + 4.85, y, 1.6, 0.46, [para(k, size=12.5, bold=True, color=INK, space_after=0)], valign="m")
+    s.text(MX + 6.3, y, 1.6, 0.46, [para(pc, size=12.5, bold=True, color=AZUL, align="r", space_after=0)],
            valign="m")
-    s.arrow(MX + 3.05, CT + 1.52, MX + 4.5, y + 0.27, color=MUT, lw=1.2)
-s.caption(MX + 0.45, CT + 2.68, 7.7,
-          "La cuota de cada SKU reparte la demanda de su familia; las cuotas suman exactamente 100 %.")
-s.card(MX + 9.3, CT, 8.6, 3.15, "Qué predice esta capa",
-       [b("No la demanda del SKU, sino su participación dentro de la familia.", size=13.8),
-        b("La demanda familiar se multiplica por esa cuota y se obtiene el pronóstico del producto.",
-          size=13.8),
+    s.arrow(MX + 3.05, CT + 1.23, MX + 4.5, y + 0.23, color=MUT, lw=1.2)
+s.text(MX + 0.45, CT + 2.02, 3.6, 0.4, [para("Las cuotas suman 100 %", size=11.5, color=MUT,
+                                             space_after=0)])
+s.card(MX + 9.3, CT, 8.6, 2.55, "Qué predice esta capa",
+       [b("No la demanda del SKU, sino su participación dentro de la familia; la demanda familiar se "
+          "multiplica por esa cuota.", size=13.4),
         b("Restringido al catálogo estratégico: las cuotas se normalizan sobre el Top 100 de cada familia.",
-          size=13.8, space_after=0)], accent=AZUL, tsize=17.5)
-s.card(MX, CT + 3.45, 8.6, 3.0, "Vía A · proporciones históricas",
-       [b("La cuota se calcula con las ventas del período de entrenamiento y se mantiene fija en el test.",
-          size=13.6),
-        b("Es el esquema que usan todos los modelos comparados: garantiza una comparación justa.",
-          size=13.6),
-        b("Resultado principal de la tesis: WAPE 16,10 %.", size=13.6, bold=True, space_after=0)],
-       accent=AMAR, tsize=17)
-s.card(MX + 9.3, CT + 3.45, 8.6, 3.0, "Vía B · cuotas supervisadas (dinámicas)",
-       [b("LightGBM, XGBoost y CatBoost predicen la cuota mes a mes con la historia que va surgiendo.",
-          size=13.6),
-        b("Variables: cuota rezagada en t−1 y t−12, medias móviles de 3 y 12 meses, meses desde la última "
-          "venta y precio relativo del SKU frente a su familia.", size=13.6),
-        b("Extensión metodológica evaluada: WAPE 24,35 %.", size=13.6, bold=True, space_after=0)],
-       accent=AZUL, tsize=17)
-s.banner(MX, CT + 6.75, CW, 0.8,
-         "Hallazgo: en catálogos con alta intermitencia, la estabilidad de las proporciones históricas venció "
-         "a la sofisticación de las cuotas aprendidas.", fill=LIGHT2, color=TXT, size=15, bold=False)
+          size=13.4, space_after=0)], accent=AZUL, tsize=17)
+vias = [("Vía A · proporciones históricas", AMAR,
+         [("La cuota se calcula con las ventas del período de entrenamiento y se mantiene fija durante el "
+           "test.", False),
+          ("Es el esquema que usan todos los modelos comparados: garantiza una comparación justa.", False),
+          ("Resultado principal: WAPE 16,10 %.", True)]),
+        ("Vía B · cuotas supervisadas", INK,
+         [("LightGBM, XGBoost y CatBoost predicen la cuota mes a mes con la historia que va surgiendo.",
+           False),
+          ("Variables: cuota rezagada en t−1 y t−12, medias móviles de 3 y 12 meses, meses desde la última "
+           "venta y precio relativo del SKU.", False),
+          ("Evaluada en la misma ventana: WAPE 24,35 %.", True)]),
+        ("Regla de selección en validación", AZUL,
+         [("El pipeline compara el WAPE de ambos esquemas sobre la ventana de validación.", False),
+          ("Adopta el de menor error para la prueba ciega, sin intervención manual.", False),
+          ("En esta ventana seleccionó el reparto estático; si el catálogo cambia, la misma regla puede "
+           "adoptar las cuotas aprendidas.", False)])]
+for i, (tit, col, bs) in enumerate(vias):
+    s.card(MX + i * 6.08, CT + 2.85, 5.73, 3.85, tit,
+           [b(t, size=13.4, bold=bo, color=(INK if bo else TXT), space_after=10) for t, bo in bs],
+           accent=col, tsize=17)
+s.banner(MX, CT + 6.95, CW, 0.72,
+         "En catálogos con alta intermitencia, la estabilidad de las proporciones históricas le ganó a la "
+         "sofisticación de las cuotas aprendidas.", fill=LIGHT2, color=TXT, size=14.5, bold=False)
 
 # ═══════════════════════════ 17 · BENCHMARK ═══════════════════════════
 s = S("05", "RESULTADOS Y EVIDENCIA", "Benchmark fuera de muestra: febrero – agosto 2025")
@@ -874,12 +877,13 @@ NOTAS = {
     "de momentum entre 1,05 y 1,50 y para cada valor se reoptimizan los pesos, quedándose con la "
     "combinación que minimiza el WAPE. La consecuencia práctica: si la industria cambia de comportamiento, "
     "la recalibración reasigna peso a los modelos que capturan mejor el nuevo régimen, sin rediseñar nada.",
-16: "1 min 30 s. La Capa 3 no predice demanda: predice la cuota de cada SKU dentro de su familia. Presentar "
-    "las dos vías con seguridad. La vía A usa proporciones históricas y es la que entrega el resultado "
-    "principal de 16,10 %, porque es el mismo esquema que usan todos los benchmarks y eso garantiza una "
-    "comparación justa. La vía B es el motor supervisado que estima la cuota mes a mes con la historia que "
-    "va surgiendo, con cuota rezagada, medias móviles, meses sin venta y precio relativo. Dio 24,35 %. "
-    "El hallazgo es interesante: en catálogos muy intermitentes la estabilidad le gana a la sofisticación.",
+16: "1 min 45 s. La Capa 3 no predice demanda: predice la cuota de cada SKU dentro de su familia. Vía A: "
+    "proporciones históricas, que es el esquema que usan todos los benchmarks y por eso garantiza una "
+    "comparación justa; entrega el 16,10 %. Vía B: el motor supervisado que estima la cuota mes a mes con "
+    "cuota rezagada, medias móviles, meses sin venta y precio relativo; dio 24,35 %. Y lo importante: el "
+    "pipeline no elige a mano. Compara el WAPE de ambos esquemas en la ventana de validación y adopta el "
+    "de menor error para la prueba ciega; en esta ventana seleccionó el reparto estático. Si el catálogo "
+    "cambiara de comportamiento, la misma regla podría adoptar las cuotas aprendidas sin rediseñar nada.",
 17: "2 min. Resultado principal. Leer de abajo hacia arriba: Croston 84,87 %, SARIMA 76,74 %, Seasonal Naïve "
     "69,89 %, Chronos-Bolt 48,44 %, LSTM 45,75 % y ES-GBM 16,10 %. A nivel familia, 12,89 %. Pausa después "
     "del número.",
