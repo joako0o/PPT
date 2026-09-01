@@ -426,6 +426,9 @@ class Deck:
                                       f"{o['paras'][0]['text'][:55]!r}")
                     if o["x"] < 0.3 or o["x"] + o["w"] > W - 0.3:
                         issues.append(f"S{i:02d} TEXTO fuera de márgenes x={o['x']:.2f} w={o['w']:.2f}")
+                if kind in ("rect", "img", "text"):
+                    if o["y"] + o["h"] > FOOT_Y - 0.20 and not (kind == "text" and o["h"] < 0.45):
+                        issues.append(f"S{i:02d} {kind.upper()} INVADE EL PIE  y+h={o['y']+o['h']:.2f} > 10.22")
                 for k in ("rect", "img"):
                     if kind == k:
                         if o["y"] + o["h"] > H - 0.15 or o["y"] < 0.1:

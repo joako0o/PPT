@@ -35,6 +35,32 @@ def b(t, size=14.2, space_after=7, **kw):
     return para(t, size=size, bullet=True, color=TXT, space_after=space_after, line=1.18, **kw)
 
 
+def tabla_bt(sl, x, y, w, cols, rows, rowh=0.86, fsize=12.6):
+    """Tabla estilo booktabs: solo reglas horizontales, sin fondos ni bordes verticales."""
+    sl.hline(x, y, w, color=INK, lw=1.7)
+    cx = x
+    for cw, tit, al in cols:
+        sl.text(cx, y + 0.14, cw - 0.35, 0.42,
+                [para(tit, size=11.3, bold=True, color=GRAY, align=al, space_after=0, spc=1.5)])
+        cx += cw
+    yy = y + 0.66
+    sl.hline(x, yy, w, color=INK, lw=0.9)
+    for r, fila in enumerate(rows):
+        cx = x
+        for (cw, _, al), val in zip(cols, fila):
+            first = cx == x
+            sl.text(cx, yy, cw - 0.35, rowh,
+                    [para(val, size=(fsize + 1.3 if first else fsize),
+                          bold=first, color=(INK if first else TXT), align=al,
+                          space_after=0, line=1.2)], valign="m")
+            cx += cw
+        yy += rowh
+        if r < len(rows) - 1:
+            sl.hline(x, yy, w, color="EAEDF0", lw=0.6)
+    sl.hline(x, yy, w, color=INK, lw=1.7)
+    return yy
+
+
 # ═══════════════════════════ 1 · PORTADA ═══════════════════════════
 n[0] += 1
 s = d.new()
@@ -99,7 +125,7 @@ for i, (lab, val) in enumerate([("Primavera", "31 %"), ("Verano", "25 %"), ("Inv
     s.rect(x, 8.42, 2.2, 1.05, fill=WHITE, line=LINE, radius=0.05)
     s.text(x, 8.42, 2.2, 1.05, [para(val, size=20, bold=True, color=AZUL, align="c", space_after=1),
                                 para(lab, size=12, color=GRAY, align="c", space_after=0)], valign="m")
-s.caption(9.65, 9.55, 9.3, "Participación de cada estación en la demanda anual (waffle, anexo A6).")
+s.caption(9.65, 9.55, 9.3, "Participación de cada estación en la demanda anual (waffle, anexo A8).")
 
 # ═══════════════════════════ 4 · EL PROBLEMA ═══════════════════════════
 s = S("01", "CONTEXTO Y PROBLEMA", "Series que prenden y se apagan: demanda intermitente")
@@ -225,7 +251,7 @@ s.card(MX + 9.15, CT + 3.5, 8.75, 3.35, "Asimetría metodológica declarada",
         b("La arquitectura propuesta sí contó con ingeniería de variables y calibración por fases: "
           "esto debe considerarse al interpretar la magnitud del diferencial.", space_after=0)],
        accent=INK)
-s.banner(MX, CT + 7.15, CW, 0.85,
+s.banner(MX, CT + 7.0, CW, 0.72,
          "Declarar los supuestos por adelantado es lo que permite interpretar correctamente la magnitud "
          "de los resultados.", fill=LIGHT2, color=TXT, size=15, bold=False)
 
@@ -314,7 +340,7 @@ s.banner(MX, 8.75, CW, 1.25,
          "el papel y falla en producción. El 16,10 % vale porque se obtuvo bajo esta restricción.",
          fill=AZUL, size=16)
 
-# ═══════════════════════════ 11 · BATERÍA DE MODELOS ═══════════════════════════
+# ═══════════════════════════ 12 · BATERÍA DE MODELOS ═══════════════════════════
 s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Diez arquitecturas, un mismo protocolo",
       "Desde la heurística estacional de 1970 hasta los modelos fundacionales pre-entrenados de 2024.")
 s.rect(3.35, 3.05, 13.3, 6.15, fill=WHITE, line=LINE, radius=0.06)
@@ -465,7 +491,7 @@ s.banner(MX, CT + 6.75, CW, 0.8,
          "Hallazgo: en catálogos con alta intermitencia, la estabilidad de las proporciones históricas venció "
          "a la sofisticación de las cuotas aprendidas.", fill=LIGHT2, color=TXT, size=15, bold=False)
 
-# ═══════════════════════════ 16 · BENCHMARK ═══════════════════════════
+# ═══════════════════════════ 17 · BENCHMARK ═══════════════════════════
 s = S("05", "RESULTADOS Y EVIDENCIA", "Benchmark fuera de muestra: febrero – agosto 2025")
 s.rect(MX, CT, 11.4, 7.05, fill=WHITE, line=LINE, radius=0.06)
 s.image(f"{C}/benchmark_sku.png", MX + 0.25, CT + 0.25, 10.9, 6.55)
@@ -477,9 +503,9 @@ s.card(MX + 11.8, CT, 6.1, 3.05, "Lectura de resultados",
 s.rect(MX + 11.8, CT + 3.35, 6.1, 3.7, fill=WHITE, line=LINE, radius=0.06)
 s.image(f"{C}/benchmark_familia.png", MX + 12.0, CT + 3.5, 5.7, 3.4)
 s.caption(MX, CT + 7.2, CW,
-          "WAPE fuera de muestra sobre 7 meses de prueba ciega. Detalle completo de métricas en el anexo A1.")
+          "WAPE fuera de muestra sobre 7 meses de prueba ciega. Detalle completo de métricas en el anexo A3.")
 
-# ═══════════════════════════ 17 · CALIDAD DEL AJUSTE ═══════════════════════════
+# ═══════════════════════════ 18 · CALIDAD DEL AJUSTE ═══════════════════════════
 s = S("05", "RESULTADOS Y EVIDENCIA", "Calidad del ajuste: el pronóstico sigue a la demanda real")
 s.rect(MX, CT, 11.4, 6.2, fill=WHITE, line=LINE, radius=0.06)
 s.image(f"{F}/fig5_3.png", MX + 0.3, CT + 0.3, 10.8, 5.6)
@@ -496,22 +522,46 @@ s.card(MX + 11.8, CT + 3.85, 6.1, 3.4, "Qué dice esto",
         b("WRMSSE de 0,2017, comparable con el marco de la competencia M5.", size=13.8, space_after=0)],
        accent=AZUL, tsize=17)
 
-# ═══════════════════════════ 18 · ABLACIÓN ═══════════════════════════
-s = S("05", "RESULTADOS Y EVIDENCIA", "Ablación: la demanda no es estocástica, la dirige el plan comercial")
-s.rect(MX, CT, 8.6, 6.1, fill=WHITE, line=LINE, radius=0.06)
-s.image(f"{C}/ablation.png", MX + 0.3, CT + 0.3, 8.0, 5.5)
-s.caption(MX, CT + 6.25, 8.6, "WAPE a nivel SKU según la información de precios disponible.")
-s.rect(MX + 9.3, CT, 8.6, 4.2, fill=WHITE, line=LINE, radius=0.06)
-s.image(f"{F}/fig5_4.png", MX + 9.55, CT + 0.25, 8.1, 3.7)
-s.caption(MX + 9.3, CT + 4.35, 8.6, "Importancia por ganancia total del módulo GBDT.")
-s.card(MX + 9.3, CT + 4.85, 8.6, 2.7, "Dos lecturas, una advertencia",
-       [b("El precio ex-ante concentra el 67,0 % de la ganancia total del submodelo GBDT.", size=13.8),
-        b("Aun sin precios (38,25 %), la arquitectura supera a SARIMA (76,74 %) y SBA (83,42 %): la base "
-          "estructural aporta por sí sola.", size=13.8),
-        b("La importancia por ganancia no es una estimación causal de la elasticidad precio.",
-          size=13.8, space_after=0)], accent=AMAR, tsize=17)
+# ═══════════════════════════ 19 · ABLACIÓN ═══════════════════════════
+s = S("05", "RESULTADOS Y EVIDENCIA", "Ablación del vector de precios: tres configuraciones, un mismo ensamble")
+s.rect(MX, CT, 8.6, 5.0, fill=WHITE, line=LINE, radius=0.06)
+s.image(f"{C}/ablation.png", MX + 0.3, CT + 0.25, 8.0, 4.5)
+s.caption(MX, CT + 5.15, 8.6, "WAPE a nivel SKU según la información de precios disponible al pronosticar.")
+s.card(MX, CT + 5.55, 8.6, 2.15, "Cómo se corrió el experimento",
+       [b("Se reentrena el ensamble completo excluyendo o rezagando el vector de precios; el resto del "
+          "protocolo se mantiene idéntico.", size=13.6),
+        b("Ejecuciones separadas del pipeline: 8 semillas × 3 modelos GBDT × NNLS × ruteo.",
+          size=13.6, space_after=0)], accent=INK, tsize=17)
+s.text(MX + 9.3, CT - 0.06, 8.6, 0.4, [para("ESTUDIO DE ABLACIÓN · NIVEL SKU (TABLA 5.5)", size=12.5,
+                                            bold=True, color=GRAY, space_after=0, spc=1.8)])
+tx = MX + 9.3
+cols = [(0.0, 3.5, "Configuración de precios", "l"), (3.5, 1.4, "WAPE", "r"), (4.9, 1.3, "MAPE", "r"),
+        (6.2, 1.2, "RMSE", "r"), (7.4, 1.2, "R²", "r")]
+yh = CT + 0.42
+s.rect(tx, yh, 8.6, 0.55, fill=INK)
+for dx, wd, t, al in cols:
+    s.text(tx + dx + 0.18, yh, wd - 0.36, 0.55,
+           [para(t, size=12.5, bold=True, color=WHITE, align=al, space_after=0)], valign="m")
+filas = [("1 · Sin información de precios", "38,25 %", "44,10 %", "58,3", "0,69", False),
+         ("2 · Con precio rezagado t−1", "26,42 %", "31,50 %", "41,2", "0,78", False),
+         ("3 · Con plan comercial ex-ante t", "16,10 %", "20,47 %", "26,7", "0,95", True)]
+for i, (cfg, wa, ma, rm, r2, hero) in enumerate(filas):
+    y = yh + 0.55 + i * 0.72
+    s.rect(tx, y, 8.6, 0.72, fill=("E8EEF3" if hero else WHITE), line=LINE)
+    if hero:
+        s.rect(tx, y, 0.06, 0.72, fill=AZUL)
+    for (dx, wd, _, al), v in zip(cols, (cfg, wa, ma, rm, r2)):
+        s.text(tx + dx + 0.18, y, wd - 0.36, 0.72,
+               [para(v, size=13.5, bold=hero, color=(AZUL_D if hero else TXT), align=al, space_after=0)],
+               valign="m")
+s.caption(tx, yh + 2.78, 8.6,
+          "La configuración 3 es el modelo propuesto; las otras dos son reentrenamientos controlados.")
+s.rect(tx, CT + 3.75, 8.6, 3.8, fill=WHITE, line=LINE, radius=0.06)
+s.image(f"{F}/fig5_4.png", tx + 0.25, CT + 3.95, 8.1, 3.4)
+s.caption(tx, CT + 7.42, 8.6,
+          "Importancia por ganancia total del módulo GBDT: el precio ex-ante concentra el 67,0 %.")
 
-# ═══════════════════════════ 19 · IMPACTO FINANCIERO ═══════════════════════════
+# ═══════════════════════════ 20 · IMPACTO FINANCIERO ═══════════════════════════
 s = S("06", "IMPACTO Y CONCLUSIONES", "Del error de pronóstico al capital de trabajo")
 fin = [("$105,6M", "CLP de capital de trabajo liberado", "efecto nivel, en balance", AZUL),
        ("$23,2M", "CLP de ahorro anual recurrente", "holding costs, i = 22 % anual", AZUL),
@@ -529,7 +579,7 @@ s.card(MX + 9.3, CT + 4.95, 8.6, 2.6, "Escala y honestidad metodológica",
         b("Ejercicio ilustrativo de orden de magnitud: usa el MAE como proxy de dispersión (sigma aprox. 1,25 × MAE).",
           size=13.8, space_after=0)], accent=INK, tsize=17)
 
-# ═══════════════════════════ 20 · CONCLUSIONES ═══════════════════════════
+# ═══════════════════════════ 21 · CONCLUSIONES ═══════════════════════════
 s = S("06", "IMPACTO Y CONCLUSIONES", "Conclusiones")
 concl = [("01", "La evidencia respalda H₁", ROJO,
           "16,10 % de WAPE a nivel SKU y 12,89 % a nivel familia (R² 0,95 y 0,96), frente a errores "
@@ -556,7 +606,7 @@ s.banner(MX, CT + 5.75, CW, 1.8,
          "comercialidad e intermitencia— al método que mejor lo resuelve, bajo un protocolo que impide que el "
          "resultado se explique por fuga de información.", fill=AZUL, size=16)
 
-# ═══════════════════════════ 21 · LIMITACIONES Y FUTURO ═══════════════════════════
+# ═══════════════════════════ 22 · LIMITACIONES Y FUTURO ═══════════════════════════
 s = S("06", "IMPACTO Y CONCLUSIONES", "Limitaciones y trabajo futuro")
 s.card(MX, CT, 8.75, 5.5, "Limitaciones reconocidas",
        [b("Horizonte h = 1 mensual: la industria con abastecimiento marítimo requiere extender la evaluación a 3 y 6 meses."),
@@ -580,7 +630,7 @@ s.banner(MX, CT + 5.85, CW, 1.7,
          "Declarar los límites con precisión es parte del resultado: define hasta dónde puede extrapolarse "
          "la evidencia y qué preguntas quedan abiertas para la siguiente iteración.", fill=AZUL, size=16.5)
 
-# ═══════════════════════════ 22 · CIERRE ═══════════════════════════
+# ═══════════════════════════ 23 · CIERRE ═══════════════════════════
 n[0] += 1
 s = d.new()
 s.image(LOGO, (W - 3.4) / 2, 1.5, 3.4, 1.57)
@@ -606,19 +656,78 @@ def ANEXO(code, title, subtitle=None):
     return sl
 
 
-s = ANEXO("A1", "Comparativa consolidada de desempeño (Tabla 5.1)")
+s = ANEXO("A1", "Los modelos de referencia, en simple")
+cols = [(3.0, "Modelo", "l"), (4.9, "Qué hace", "l"), (4.4, "Punto fuerte", "l"),
+        (4.3, "Punto débil", "l"), (1.3, "WAPE", "r")]
+rows = [
+ ("Seasonal Naïve", "Repite lo que se vendió el mismo mes del año anterior.",
+  "Referencia honesta y sin costo: captura la estacionalidad pura.",
+  "Ciega a precios, campañas y cambios de tendencia.", "69,89 %"),
+ ("SARIMA", "Proyecta la serie usando su propia historia y su ciclo anual.",
+  "Estándar de la literatura: interpretable y reproducible.",
+  "Es lineal y no admite información externa; los ceros la desestabilizan.", "76,74 %"),
+ ("SARIMAX", "SARIMA más variables externas: precio y descuento.",
+  "Incorpora la palanca comercial dentro de un marco econométrico.",
+  "La relación precio-demanda no es lineal: la estructura se le queda corta.", "73,24 %"),
+ ("Croston", "Separa dos preguntas: cada cuánto se vende y cuánto se vende.",
+  "Diseñado específicamente para demanda con muchos ceros.",
+  "No modela estacionalidad ni precio, que es justo lo que manda en moda.", "84,87 %"),
+ ("SBA", "Croston con una corrección de sesgo (Syntetos-Boylan).",
+  "Corrige la sobreestimación sistemática del Croston clásico.",
+  "Hereda la misma ceguera estacional y comercial.", "83,42 %"),
+ ("LSTM", "Red neuronal con memoria que aprende patrones de secuencias.",
+  "Captura relaciones no lineales y dependencias temporales largas.",
+  "Exige mucha historia; con series cortas e intermitentes se vuelve inestable.", "45,75 %"),
+ ("Chronos-Bolt", "Modelo fundacional pre-entrenado sobre miles de millones de series.",
+  "Predice sin entrenamiento previo; muy sólido en agregado (36,35 % en familia).",
+  "No admite las variables comerciales propias de la empresa.", "48,44 %"),
+]
+yfin = tabla_bt(s, MX, CT, CW, cols, rows, rowh=0.82)
+s.banner(MX, yfin + 0.42, CW, 0.75,
+         "Ninguna referencia clásica combina las tres cosas que exige la moda: ceros, estacionalidad fuerte "
+         "y sensibilidad al plan comercial.", fill=LIGHT2, color=TXT, size=14, bold=False)
+
+s = ANEXO("A2", "Los componentes de la arquitectura propuesta")
+cols2 = [(2.7, "Componente", "l"), (1.9, "Dónde actúa", "l"), (4.9, "Qué hace", "l"),
+         (4.2, "Punto fuerte", "l"), (4.2, "Punto débil", "l")]
+rows2 = [
+ ("Holt amortiguado", "Capa 2", "Suaviza la serie y estima su nivel y tendencia, frenando la extrapolación.",
+  "Muy estable y con pocos parámetros: entrega una base limpia.",
+  "Por sí solo ignora precios y cualquier relación no lineal."),
+ ("XGBoost", "Capas 1 y 2", "Árboles que corrigen, uno tras otro, el error del anterior.",
+  "Captura interacciones como precio por temporada; muy preciso en datos tabulares.",
+  "No extrapola tendencias fuera del rango que vio en entrenamiento."),
+ ("LightGBM", "Capas 1 y 2", "Mismo principio que XGBoost, pero por histogramas: mucho más rápido.",
+  "Escala bien y maneja con soltura las variables categóricas.",
+  "Puede sobreajustar en series cortas si no se regula."),
+ ("CatBoost", "Capas 1 y 2", "Boosting ordenado, pensado para variables categóricas.",
+  "Robusto con familias y canales; menos propenso al sobreajuste.",
+  "Es el más lento de entrenar de los tres."),
+ ("TabPFN", "En paralelo", "Modelo fundacional para tablas: infiere sin entrenar.",
+  "Buen desempeño inmediato y aporta diversidad al ensamble.",
+  "Pensado para conjuntos pequeños; no es un modelo de series nativo."),
+ ("NNLS y ruteo", "Validación", "Decide cuánto pesa cada predicción y en qué régimen aplicarla.",
+  "Adapta el ensamble al momento comercial de cada familia.",
+  "Los pesos deben recalibrarse cuando cambia la estructura del mercado."),
+]
+yfin2 = tabla_bt(s, MX, CT, CW, cols2, rows2, rowh=0.92)
+s.banner(MX, yfin2 + 0.42, CW, 0.85,
+         "La arquitectura no elige un ganador: pone a cada método a hacer aquello en lo que es bueno y deja "
+         "que la validación decida el peso.", fill=AZUL, size=15)
+
+s = ANEXO("A3", "Comparativa consolidada de desempeño (Tabla 5.1)")
 s.rect(MX, CT, CW, 6.7, fill=WHITE, line=LINE, radius=0.06)
 s.image(TABLA51, MX + 0.4, CT + 0.3, 17.1, 6.1)
 s.caption(MX, CT + 6.85, CW, "Métricas completas fuera de muestra (feb–ago 2025) para los diez modelos "
                              "evaluados, en los niveles SKU y familia.")
 
-s = ANEXO("A2", "Pronóstico vs. demanda real por modelo")
+s = ANEXO("A4", "Pronóstico vs. demanda real por modelo")
 s.rect(MX, CT, CW, 6.9, fill=WHITE, line=LINE, radius=0.06)
 s.image(f"{F}/fig5_1.png", MX + 0.4, CT + 0.3, 17.1, 6.3)
 s.caption(MX, CT + 7.05, CW, "Seis arquitecturas representativas contra la demanda observada del Top 100 "
                              "SKUs en la ventana de prueba.")
 
-s = ANEXO("A3", "Diagnóstico de residuos del modelo propuesto")
+s = ANEXO("A5", "Diagnóstico de residuos del modelo propuesto")
 s.rect(MX, CT, CW, 4.6, fill=WHITE, line=LINE, radius=0.06)
 s.image(f"{F}/fig5_5.png", MX + 0.4, CT + 0.3, 17.1, 4.0)
 s.card(MX, CT + 4.9, 8.75, 2.6, "Qué muestra el diagnóstico",
@@ -630,7 +739,7 @@ s.card(MX + 9.15, CT + 4.9, 8.75, 2.6, "Alcance de la conclusión",
         b("No se afirma homocedasticidad estricta; la evidencia es consistente con un comportamiento "
           "residual adecuado.", space_after=0)], accent=MUT, tsize=17)
 
-s = ANEXO("A4", "Intermitencia: del catálogo completo a un SKU")
+s = ANEXO("A6", "Intermitencia: del catálogo completo a un SKU")
 s.rect(MX, CT, 10.4, 7.05, fill=WHITE, line=LINE, radius=0.06)
 s.image(HEATMAP, MX + 0.3, CT + 0.3, 9.8, 6.15)
 s.caption(MX + 0.3, CT + 6.55, 9.8, "Matriz de demanda: 100 SKUs × 66 meses.")
@@ -643,7 +752,7 @@ s.card(MX + 10.8, CT + 4.0, 7.1, 3.05, "Lectura",
         b("La agregación a familia recupera una señal continua y estacional.", size=13.8, space_after=0)],
        accent=AZUL, tsize=17)
 
-s = ANEXO("A5", "Matriz de sensibilidad del impacto financiero (Tabla 6.1)")
+s = ANEXO("A7", "Matriz de sensibilidad del impacto financiero (Tabla 6.1)")
 rows = [("Conservador", "$12.000", "18 %", "$84,5M CLP", "$15,2M CLP/año", False),
         ("Caso base", "$15.000", "22 %", "$105,6M CLP", "$23,2M CLP/año", True),
         ("Exigente (alta merma)", "$18.000", "26 %", "$126,8M CLP", "$33,0M CLP/año", False)]
@@ -677,7 +786,7 @@ s.card(MX + 9.15, yh + 3.8, 8.75, 1.75, None,
 s.caption(MX, yh + 5.75, CW, "Supuestos: Z = 1,645 (CSL 95 %); SS = Z × MAE × K × raíz(L). Ejercicio ilustrativo "
                              "de orden de magnitud.")
 
-s = ANEXO("A6", "Entorno macro y estacionalidad de la demanda")
+s = ANEXO("A8", "Entorno macro y estacionalidad de la demanda")
 s.rect(MX, CT, 10.6, 5.2, fill=WHITE, line=LINE, radius=0.06)
 s.image(f"{F}/fig2_2.png", MX + 0.35, CT + 0.3, 9.9, 4.6)
 s.caption(MX, CT + 5.35, 10.6, "IPC de vestuario y calzado, serie mensual auditada INE (base 2023 = 100).")
@@ -689,7 +798,7 @@ s.card(MX, CT + 5.9, 10.6, 1.65, None,
              "estaciones, sin un peak único dominante.", size=13.5, color=TXT, space_after=0, line=1.2)],
        accent=AMAR)
 
-s = ANEXO("A7", "Trazabilidad, verificación y uso de herramientas de IA")
+s = ANEXO("A9", "Trazabilidad, verificación y uso de herramientas de IA")
 s.card(MX, CT, 8.75, 5.4, "Mecanismos de verificación",
        [b("Separación cronológica estricta entre entrenamiento, validación y prueba."),
         b("Pruebas automatizadas sobre rezagos y disponibilidad temporal de cada variable."),
@@ -776,9 +885,13 @@ NOTAS = {
     "del número.",
 18: "1 min. El pronóstico sigue la trayectoria real en los siete meses. R2 de 0,95 a nivel SKU y 0,96 a "
     "nivel familia; sesgo de -4,8 %, sub-predicción leve, sistemática y corregible.",
-19: "1 min 30 s. Ablación: sin precios 38,25 %, con precio rezagado 26,42 %, con plan ex-ante 16,10 %. La "
-    "demanda del fast fashion no es estocástica, la dirige el plan comercial. Matiz honesto: la importancia "
-    "por ganancia del 67 % no es una estimación causal de elasticidad precio.",
+19: "2 min. LÁMINA DE EVIDENCIA. Explicar que se probaron tres configuraciones reentrenando el ensamble "
+    "completo: sin ninguna información de precios, con el precio rezagado del mes anterior, y con el plan "
+    "comercial ex-ante del propio mes. Resultados: 38,25 %, 26,42 % y 16,10 % de WAPE, con R2 de 0,69, "
+    "0,78 y 0,95. Dos lecturas: el plan comercial aporta 22,2 puntos de reducción, o sea la demanda del "
+    "fast fashion no es estocástica sino dirigida; y aun sin precios el modelo queda en 38,25 %, muy por "
+    "debajo de SARIMA (76,74 %) y SBA (83,42 %), lo que muestra que no depende de forma frágil de esa "
+    "señal. Matiz honesto: el 67 % de importancia por ganancia no es una estimación causal de elasticidad.",
 20: "1 min 30 s. Traducción a negocio: pasar de MAE 54,2 a 11,4 unidades por SKU baja el stock de seguridad "
     "de 8.916 a 1.875 unidades. Son 7.041 unidades, 105,6 millones de capital liberado y 23,2 millones "
     "anuales de ahorro. Declarar de inmediato que es un ejercicio ilustrativo de orden de magnitud.",
@@ -789,14 +902,18 @@ NOTAS = {
     "de noviembre-diciembre, ejercicio financiero ilustrativo. Luego trabajo futuro.",
 23: "Cierre. Agradecer al profesor guía, a la profesora correferente y a la empresa por los datos. Silencio "
     "y esperar preguntas. Los anexos A1 a A7 respaldan las respuestas.",
-24: "Anexo A1. Tabla 5.1 completa: WAPE, sMAPE, RMSE, MAE, sesgo, R2 y ranking en ambos niveles.",
-25: "Anexo A2. Comparativa visual de seis arquitecturas contra la demanda real.",
-26: "Anexo A3. Residuos: Ljung-Box p = 0,751 y Shapiro-Wilk p = 0,184. Usar si preguntan por supuestos.",
-27: "Anexo A4. Evidencia de intermitencia: matriz completa y un SKU con 62 % de meses en cero.",
-28: "Anexo A5. Sensibilidad financiera: 84,5 a 126,8 millones bajo gestión descentralizada y 8,5 a 12,7 "
+24: "Anexo A1. Glosario de los modelos de referencia en lenguaje simple. Es la lámina para responder "
+    "cualquier pregunta del tipo por qué no usó tal método o qué diferencia hay entre Croston y SARIMA.",
+25: "Anexo A2. Los componentes de la arquitectura propia y por qué cada uno está donde está. Útil si "
+    "preguntan por qué tres GBDT distintos o para qué sirve TabPFN.",
+26: "Anexo A3. Tabla 5.1 completa: WAPE, sMAPE, RMSE, MAE, sesgo, R2 y ranking en ambos niveles.",
+27: "Anexo A4. Comparativa visual de seis arquitecturas contra la demanda real.",
+28: "Anexo A5. Residuos: Ljung-Box p = 0,751 y Shapiro-Wilk p = 0,184. Usar si preguntan por supuestos.",
+29: "Anexo A6. Evidencia de intermitencia: matriz completa y un SKU con 62 % de meses en cero.",
+30: "Anexo A7. Sensibilidad financiera: 84,5 a 126,8 millones bajo gestión descentralizada y 8,5 a 12,7 "
     "millones con risk pooling. Usar si cuestionan el supuesto de agregación.",
-29: "Anexo A6. Contexto macro: el IPC de vestuario cae de forma sostenida. Estacionalidad repartida.",
-30: "Anexo A7. Protocolo de verificación y uso declarado de herramientas de IA.",
+31: "Anexo A8. Contexto macro: el IPC de vestuario cae de forma sostenida. Estacionalidad repartida.",
+32: "Anexo A9. Protocolo de verificación y uso declarado de herramientas de IA.",
 }
 for i, sl in enumerate(d.slides, 1):
     if i in NOTAS:
