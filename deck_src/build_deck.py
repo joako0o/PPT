@@ -367,7 +367,8 @@ s.banner(MX, 8.75, CW, 1.25,
 
 # ═══════════════════════════ 12 · BATERÍA DE MODELOS ═══════════════════════════
 s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Diez arquitecturas, un mismo protocolo",
-      "Desde la heurística estacional de 1970 hasta los modelos fundacionales pre-entrenados de 2024.")
+      "Desde las heurísticas estacionales clásicas hasta los modelos fundacionales pre-entrenados "
+      "de 2024.")
 s.rect(3.35, 3.05, 13.3, 6.15, fill=WHITE, line=LINE, radius=0.06)
 s.image(EVOL, 3.75, 3.35, 12.5, 5.55)
 s.banner(MX, 9.35, CW, 0.67,
@@ -380,10 +381,10 @@ s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Arquitectura ES-GBM: dos tracks en p
 s.pill((W - 13.0) / 2, 2.38, 13.0, 0.55,
        "Fase 0  ·  Panel Familia × Fecha con variables auditadas y rezagadas", fill=INK, size=13.5)
 tracks = [(MX, 6.9, "CAPA 1  ·  SIN SUAVIZAMIENTO", ROJO, "Modelos sobre la serie directa",
-           ["XGBoost · LightGBM · CatBoost", "Escala arcsinh con decay de 24 meses",
+           ["XGBoost · LightGBM · CatBoost", "Escala arcsinh, decay con vida media de 24 meses",
             "Reactiva: sigue los giros bruscos", "3 predicciones"]),
           (MX + 7.2, 6.9, "CAPA 2  ·  CON SUAVIZAMIENTO", AMAR_D, "Modelos sobre la serie relativa al nivel",
-           ["LightGBM · CatBoost", "Escala log(1 + unidades / nivel)",
+           ["LightGBM · CatBoost", "Escala log(1 + unidades / (nivel + 1))",
             "Nivel base extraído por Holt amortiguado", "2 predicciones"]),
           (MX + 14.4, 3.5, "EN PARALELO", AZUL, "TabPFN",
            ["Modelo fundacional tabular", "Inferencia zero-shot", "1 predicción"])]
@@ -431,7 +432,8 @@ s.card(MX + 10.0, CT, 7.9, 2.4, "Capa 1 · sin suavizamiento",
 s.card(MX + 10.0, CT + 2.7, 7.9, 2.45, "Capa 2 · con suavizamiento",
        [b("Holt amortiguado extrae el nivel base y los modelos trabajan en escala relativa a ese nivel.",
           size=13.6),
-        b("Filtra ruido y conserva estacionalidad: menor varianza, pero reacciona más tarde.",
+        b("Sobre ese nivel aprenden los residuos y los multiplicadores estacionales: menor varianza, "
+          "pero reacciona más tarde.",
           size=13.6, space_after=0)], accent=AMAR, tsize=17)
 s.banner(MX, CT + 5.7, CW, 1.85,
          "La clave es la diversificación de errores: cuando el mercado gira, la Capa 1 llega antes; cuando "
@@ -453,21 +455,19 @@ s.card(MX + 12.17, CT, 5.73, 3.5, "Ruteo por régimen",
        [b("Indicador de momentum: media móvil de 3 meses sobre media móvil de 12.", size=13.6),
         b("Si la familia acelera, pesa más el componente de nivel dinámico; si está madura, la señal "
           "conservadora.", size=13.6, space_after=0)], accent=AZUL, tsize=17.5)
-s.text(MX, CT + 3.85, CW, 0.4, [para("GRILLA DE UMBRALES EVALUADA EN VALIDACIÓN", size=12.5, bold=True,
-                                     color=GRAY, space_after=0, spc=2)])
-taus = ["1,05", "1,15", "1,25", "1,35", "1,50"]
-gw = 2.6
-for i, t in enumerate(taus):
-    x = MX + i * (gw + 0.35)
-    sel = i == 2
-    s.rect(x, CT + 4.35, gw, 1.0, fill=(AZUL if sel else LIGHT), line=(None if sel else LINE), radius=0.05)
-    s.text(x, CT + 4.35, gw, 1.0, [para(t, size=17, bold=True, color=(WHITE if sel else GRAY),
-                                        align="c", space_after=0)], valign="m")
-s.text(MX + 2 * (gw + 0.35), CT + 5.45, gw, 0.35,
-       [para("τ* seleccionado", size=12, bold=True, color=AZUL, align="c", space_after=0)])
-s.text(MX + 15.0, CT + 4.35, 2.9, 1.0,
-       [para("...para cada umbral se reoptimizan los pesos", size=12.5, color=MUT, space_after=0, line=1.2)],
-       valign="m")
+s.text(MX, CT + 3.85, CW, 0.4, [para("GRILLA DE UMBRALES DE MOMENTUM EVALUADA EN VALIDACIÓN", size=12.5,
+                                     bold=True, color=GRAY, space_after=0, spc=2)])
+s.rect(MX, CT + 4.35, 12.6, 1.0, fill=LIGHT, radius=0.06)
+s.hline(MX + 1.5, CT + 4.85, 9.6, color=MUT, lw=1.4)
+for xx, lab in ((MX + 1.5, "1,05"), (MX + 11.1, "1,50")):
+    s.rect(xx - 0.03, CT + 4.68, 0.06, 0.34, fill=MUT)
+    s.text(xx - 0.9, CT + 4.42, 1.8, 0.3, [para(lab, size=14, bold=True, color=INK, align="c",
+                                                space_after=0)])
+s.rect(MX + 6.24, CT + 4.60, 0.10, 0.50, fill=AZUL)
+s.text(MX + 5.4, CT + 5.05, 1.8, 0.3, [para("τ*", size=14, bold=True, color=AZUL, align="c", space_after=0)])
+s.text(MX + 13.1, CT + 4.35, 4.8, 1.0,
+       [para("Para cada umbral de la grilla se reoptimizan los pesos de ruteo; se adopta el que minimiza "
+             "el WAPE en validación.", size=12.8, color=TXT, space_after=0, line=1.2)], valign="m")
 s.banner(MX, CT + 6.0, CW, 1.55,
          "Esto es lo que da sostenibilidad en el tiempo: los pesos no son una constante del modelo, son un "
          "parámetro recalibrable. Si cambia la estructura del mercado, la recalibración reasigna peso hacia "
