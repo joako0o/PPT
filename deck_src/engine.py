@@ -149,12 +149,16 @@ class Slide:
                             align="r", space_after=0)])
 
     def card(self, x, y, w, h, title=None, body=None, accent=None, fill=LIGHT,
-             tsize=17, bsize=14.2, pad=0.42, border=None, title_color=INK):
+             tsize=17, bsize=14.2, pad=0.42, border=None, title_color=INK,
+             accent_style="left"):
         self.rect(x, y, w, h, fill=fill, line=border, radius=0.055)
-        if accent:
+        side = accent and accent_style == "left"
+        if side:
             self.rect(x, y, 0.075, h, fill=accent, radius=0.0)
-        tx = x + pad + (0.08 if accent else 0)
-        tw = w - 2 * pad - (0.08 if accent else 0)
+        elif accent and accent_style == "top":
+            self.rect(x, y, w, 0.075, fill=accent, radius=0.0)
+        tx = x + pad + (0.08 if side else 0)
+        tw = w - 2 * pad - (0.08 if side else 0)
         paras = []
         if title:
             paras.append(para(title, size=tsize, bold=True, color=title_color,
@@ -177,6 +181,13 @@ class Slide:
         self.rect(x, y, w, h, fill=fill, radius=radius)
         self.text(x + 0.16, y, w - 0.32, h, [para(text, size=size, bold=bold, color=color,
                                                   align="c", space_after=0, line=1.1)], valign="m")
+
+    def takeaway(self, x, y, w, text, color=ROJO, size=16.5):
+        """Cierre de lámina sin caja: regla corta de color + frase. Reemplaza al banner."""
+        self.rect(x, y, 0.62, 0.075, fill=color)
+        h = max(0.5, min(1.3, FOOT_Y - 0.22 - (y + 0.26)))
+        self.text(x, y + 0.26, w, h,
+                  [para(text, size=size, bold=True, color=INK, space_after=0, line=1.28)])
 
     def caption(self, x, y, w, text, align="l", size=11.5):
         self.text(x, y, w, 0.42, [para(text, size=size, color=MUT, align=align, space_after=0, line=1.2)])

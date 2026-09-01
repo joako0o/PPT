@@ -85,6 +85,19 @@ def metrica(sl, x, w, abbr, nombre, img, simbolos, lectura, col):
             [para(lectura, size=12.7, color=TXT, space_after=0, line=1.2)], accent=col, tsize=15.5, pad=0.32)
 
 
+def DIV(num, titulo, subtitulo):
+    n[0] += 1
+    sl = d.new()
+    sl.text(MX, 3.15, 4.8, 3.3, [para(num, size=140, bold=True, color="E4EAEF", space_after=0, line=1.0)],
+            valign="m")
+    for i, c in enumerate((ROJO, AMAR, AZUL)):
+        sl.rect(MX + 5.3 + i * 0.92, 4.30, 0.86, 0.085, fill=c)
+    sl.text(MX + 5.3, 4.66, 12.2, 1.1, [para(titulo, size=42, bold=True, color=INK, space_after=0,
+                                             line=1.05)])
+    sl.text(MX + 5.3, 5.92, 11.4, 0.9, [para(subtitulo, size=17, color=GRAY, space_after=0, line=1.25)])
+    return sl
+
+
 # ═══════════════════════════ 1 · PORTADA ═══════════════════════════
 n[0] += 1
 s = d.new()
@@ -129,6 +142,8 @@ for i, (num, tit, des) in enumerate(items):
     s.text(x + 1.85, y, cw - 2.3, ch, [para(tit, size=18.5, bold=True, color=INK, space_after=5),
                                        para(des, size=13.5, color=GRAY, space_after=0, line=1.2)], valign="m")
 
+DIV("01", "Contexto y problema", "La moda femenina compromete inventario seis meses antes de\nsaber qué va a vender.")
+
 # ═══════════════════════════ 3 · CONTEXTO ═══════════════════════════
 s = S("01", "CONTEXTO Y PROBLEMA", "La moda femenina decide hoy lo que venderá en seis meses")
 cards = [("Ciclos de vida ultracortos",
@@ -171,30 +186,45 @@ s.banner(8.85, 9.15, 10.1, 0.87,
          "Cada punto de error se paga dos veces: en capital inmovilizado y en venta perdida.",
          fill=AZUL, size=15.5)
 
+DIV("02", "Pregunta, hipótesis y objetivo", "Qué se pone a prueba y con qué métrica se decide.")
+
 # ═══════════════════════════ 5 · PREGUNTA E HIPÓTESIS ═══════════════════════════
 s = S("02", "PREGUNTA, HIPÓTESIS Y OBJETIVO", "Qué se pone a prueba")
-s.card(MX, CT, CW, 1.95, "Pregunta de investigación",
+s.text(MX, CT - 0.02, CW, 0.34, [para("PREGUNTA DE INVESTIGACIÓN", size=12, bold=True, color=GRAY,
+                                      space_after=0, spc=1.8)])
+s.rect(MX, CT + 0.42, 0.09, 1.62, fill=ROJO)
+s.text(MX + 0.55, CT + 0.38, 16.6, 1.8,
        [para("¿Cuál enfoque de modelado —clásicos univariados, causales, redes recurrentes, modelos "
-             "fundacionales pre-entrenados o arquitecturas híbridas de ensamble jerárquico— alcanza la mayor "
-             "capacidad predictiva y robustez metodológica para pronosticar la demanda de retail de moda en "
-             "Chile, evaluado mediante WAPE en un horizonte mensual h = 1?",
-             size=14.5, color=TXT, space_after=0, line=1.26)], accent=ROJO)
-s.card(MX, CT + 2.2, 8.7, 2.15, "H₀  ·  hipótesis nula",
-       [para("El WAPE esperado de la arquitectura ES-GBM no es inferior al de los benchmarks primarios "
-             "(SARIMA, SARIMAX y LSTM).", size=14.5, color=TXT, space_after=0, line=1.26)],
-       accent=MUT, fill=LIGHT2)
-s.card(MX + 9.2, CT + 2.2, 8.7, 2.15, "H₁  ·  hipótesis de trabajo",
-       [para("El WAPE esperado de la arquitectura ES-GBM es inferior al de los benchmarks primarios de "
-             "referencia.", size=14.5, color=TXT, space_after=0, line=1.26)], accent=AZUL)
-s.card(MX, CT + 4.6, CW, 1.95, "Objetivo general",
-       [para("Desarrollar y evaluar una arquitectura de pronóstico jerárquica de ensamble (ES-GBM con "
-             "desacoplamiento jerárquico a nivel SKU) para el retail de moda femenina en Chile, que minimice "
-             "el error de predicción integrando variables comerciales ex-ante y suavizamiento exponencial, "
-             "con el fin de optimizar la eficiencia del capital de trabajo.",
-             size=14.5, color=TXT, space_after=0, line=1.26)], accent=AMAR)
-s.banner(MX, CT + 6.85, CW, 0.85,
-         "Benchmarks primarios: SARIMA · SARIMAX · LSTM      |      Referencias de frontera: "
-         "Croston · SBA · Seasonal Naïve · Chronos-Bolt", fill=LIGHT2, color=TXT, size=14.5, bold=False)
+             "fundacionales o ensambles jerárquicos híbridos— alcanza la mayor capacidad predictiva y "
+             "robustez metodológica para pronosticar la demanda de retail de moda en Chile, evaluado "
+             "mediante WAPE en un horizonte mensual h = 1?",
+             size=20, color=INK, space_after=0, line=1.32)])
+s.hline(MX, CT + 2.52, CW, color=LINE, lw=0.75)
+for i_, (col, tit, txt) in enumerate(
+        [(MUT, "H₀  ·  hipótesis nula",
+          "El WAPE esperado de la arquitectura ES-GBM no es inferior al de los benchmarks primarios de "
+          "referencia: SARIMA, SARIMAX y LSTM."),
+         (AZUL, "H₁  ·  hipótesis de trabajo",
+          "El WAPE esperado de la arquitectura ES-GBM es inferior al de los benchmarks primarios de "
+          "referencia.")]):
+    x = MX + i_ * 9.5
+    s.rect(x, CT + 2.85, 0.62, 0.075, fill=col)
+    s.text(x, CT + 3.12, 8.4, 0.4, [para(tit, size=17, bold=True, color=INK, space_after=0)])
+    s.text(x, CT + 3.62, 8.4, 1.3, [para(txt, size=15.5, color=TXT, space_after=0, line=1.28)])
+s.hline(MX, CT + 5.18, CW, color=LINE, lw=0.75)
+s.text(MX, CT + 5.45, CW, 0.34, [para("OBJETIVO GENERAL", size=12, bold=True, color=GRAY, space_after=0,
+                                      spc=1.8)])
+s.rect(MX, CT + 5.9, 0.09, 1.32, fill=AMAR)
+s.text(MX + 0.55, CT + 5.86, 16.6, 1.5,
+       [para("Desarrollar y evaluar una arquitectura de pronóstico jerárquica de ensamble para el retail de "
+             "moda femenina en Chile, que minimice el error de predicción integrando variables comerciales "
+             "ex-ante y suavizamiento exponencial, con el fin de optimizar la eficiencia del capital de "
+             "trabajo.", size=17, color=INK, space_after=0, line=1.3)])
+s.text(MX, CT + 7.35, CW, 0.4,
+       [para("Benchmarks primarios: SARIMA · SARIMAX · LSTM     |     Referencias de frontera: Croston · SBA · "
+             "Seasonal Naïve · Chronos-Bolt", size=13.5, color=MUT, space_after=0)])
+
+DIV("03", "Datos, variables y supuestos", "El núcleo comercial: 100 SKUs, 58 familias y 66 meses\nde historia.")
 
 # ═══════════════════════════ 6 · DATOS Y ALCANCE ═══════════════════════════
 s = S("03", "DATOS, VARIABLES Y SUPUESTOS", "El núcleo comercial: dónde se juega el margen")
@@ -247,10 +277,10 @@ vcards = [("Target e identificación", ROJO,
 for i, (t, col, bs) in enumerate(vcards):
     s.card(MX + i * 6.08, CT, 5.73, 4.3, t, [b(x, size=14.8, space_after=13) for x in bs],
            accent=col, tsize=17.5)
-s.banner(MX, CT + 4.65, CW, 2.2,
-         "Regla de oro anti-leakage: toda variable usa información disponible en t−1, salvo el plan comercial "
+s.takeaway(MX, CT + 4.65 + 0.12, CW,
+           "Regla de oro anti-leakage: toda variable usa información disponible en t−1, salvo el plan comercial "
          "que la propia empresa fija ex-ante. Pruebas automatizadas sobre rezagos verifican que ninguna "
-         "variable filtre información del futuro.", fill=AZUL, size=17)
+         "variable filtre información del futuro.", color=AZUL)
 
 # ═══════════════════════════ 8 · SUPUESTOS ═══════════════════════════
 s = S("03", "DATOS, VARIABLES Y SUPUESTOS", "Supuestos y consideraciones relevantes")
@@ -279,6 +309,8 @@ s.banner(MX, CT + 7.0, CW, 0.72,
          "Declarar los supuestos por adelantado es lo que permite interpretar correctamente la magnitud "
          "de los resultados.", fill=LIGHT2, color=TXT, size=15, bold=False)
 
+DIV("04", "Metodología y arquitectura", "Del protocolo anti-leakage a las tres capas del ES-GBM.")
+
 # ═══════════════════════════ 9 · MÉTRICA ═══════════════════════════
 s = S("04", "METODOLOGÍA Y ARQUITECTURA", "WAPE: la métrica que resiste la demanda cero")
 s.rect(MX, CT, 8.6, 3.4, fill=WHITE, line=LINE, radius=0.06)
@@ -289,7 +321,7 @@ s.card(MX, CT + 3.7, 8.6, 3.85, "Por qué WAPE y no MAPE",
         b("El WAPE agrega errores y volumen antes de dividir: pondera por unidades físicas y refleja "
           "el impacto operacional real."),
         b("Ejemplo del propio benchmark: SARIMA obtiene sMAPE 309,88 % frente a un WAPE de 76,74 %; "
-          "SARIMAX, 170,87 % frente a 73,24 %.", space_after=0)], accent=AZUL)
+          "SARIMAX, 170,87 % frente a 73,24 %.", space_after=0)], accent=AZUL, accent_style="top")
 s.rect(MX + 9.15, CT, 8.75, 5.6, fill=WHITE, line=LINE, radius=0.06)
 s.image(SIMBOLOS, MX + 9.5, CT + 0.28, 8.05, 5.04)
 s.card(MX + 9.15, CT + 5.9, 8.75, 1.65, "Métricas complementarias",
@@ -321,10 +353,10 @@ tcards = [("Entrenamiento", "Aprende los patrones históricos de nivel, estacion
 for i, (t, txt, col) in enumerate(tcards):
     s.card(MX + i * 6.08, 5.5, 5.73, 2.35, t, [para(txt, size=14, color=TXT, space_after=0, line=1.24)],
            accent=col, tsize=17)
-s.banner(MX, 8.15, CW, 1.6,
-         "En series de tiempo el orden temporal es innegociable: partición estrictamente cronológica, rezagos "
+s.takeaway(MX, 8.15 + 0.12, CW,
+           "En series de tiempo el orden temporal es innegociable: partición estrictamente cronológica, rezagos "
          "seguros en t−1 y pesos congelados desde el corte. Cualquier aleatorización filtraría el futuro hacia "
-         "el pasado.", fill=AZUL, size=15.5)
+         "el pasado.", color=AZUL)
 
 # ═══════════════════════════ 11 · FASE 0 · ANTI-LEAKAGE ═══════════════════════════
 s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Fase 0 · La frontera de información",
@@ -360,10 +392,9 @@ f0 = [("Auditoría variable por variable", ROJO,
 for i, (t, col, txt) in enumerate(f0):
     s.card(MX + i * 6.08, 5.95, 5.73, 2.6, t, [para(txt, size=13.8, color=TXT, space_after=0, line=1.24)],
            accent=col, tsize=17)
-s.banner(MX, 8.75, CW, 1.25,
-         "Sin esta fase, cualquier resultado sería un artefacto: un modelo que ve el futuro siempre gana en "
-         "el papel y falla en producción. El 16,10 % vale porque se obtuvo bajo esta restricción.",
-         fill=AZUL, size=16)
+s.takeaway(MX, 8.75 + 0.12, CW,
+           "Sin esta fase, cualquier resultado sería un artefacto: un modelo que ve el futuro siempre gana en "
+         "el papel y falla en producción. El 16,10 % vale porque se obtuvo bajo esta restricción.", color=AZUL)
 
 # ═══════════════════════════ 12 · BATERÍA DE MODELOS ═══════════════════════════
 s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Diez arquitecturas, un mismo protocolo",
@@ -405,9 +436,9 @@ s.hline(MX + 3.45, ty + th + 0.20, 12.70, color=MUT, lw=1.5)
 s.arrow(10.0, ty + th + 0.20, 10.0, 6.06, color=MUT, lw=1.6)
 s.pill((W - 8.4) / 2, 6.10, 8.4, 0.55, "6 predicciones candidatas por familia", fill=LIGHT2, color=INK, size=14.5)
 s.arrow(10.0, 6.68, 10.0, 6.88, color=MUT, lw=1.6)
-s.banner(MX, 6.95, CW, 0.82,
-         "VALIDACIÓN  ·  Ponderación NNLS y búsqueda en grilla: se fija el peso de cada modelo y el umbral "
-         "de ruteo minimizando el WAPE", fill=AZUL, size=14.5)
+s.takeaway(MX, 6.95 + 0.12, CW,
+           "VALIDACIÓN  ·  Ponderación NNLS y búsqueda en grilla: se fija el peso de cada modelo y el umbral "
+         "de ruteo minimizando el WAPE", color=ROJO)
 s.arrow(10.0, 7.85, 10.0, 8.05, color=MUT, lw=1.6)
 s.pill((W - 10.5) / 2, 8.10, 10.5, 0.55, "Demanda proyectada por familia  ·  WAPE 12,89 %",
        fill="E8EEF3", color=AZUL_D, size=14.5)
@@ -428,17 +459,17 @@ s.caption(MX, CT + 5.15, 9.4, "Comportamiento esperado de cada track frente a la
 s.card(MX + 10.0, CT, 7.9, 2.4, "Capa 1 · sin suavizamiento",
        [b("Los modelos ven la serie tal cual, en escala arcsinh.", size=13.6),
         b("Reacciona rápido a shocks comerciales, pero hereda el ruido: mayor varianza.",
-          size=13.6, space_after=0)], accent=ROJO, tsize=17)
+          size=13.6, space_after=0)], accent=ROJO, tsize=17, accent_style="top")
 s.card(MX + 10.0, CT + 2.7, 7.9, 2.45, "Capa 2 · con suavizamiento",
        [b("Holt amortiguado extrae el nivel base y los modelos trabajan en escala relativa a ese nivel.",
           size=13.6),
         b("Sobre ese nivel aprenden los residuos y los multiplicadores estacionales: menor varianza, "
           "pero reacciona más tarde.",
-          size=13.6, space_after=0)], accent=AMAR, tsize=17)
-s.banner(MX, CT + 5.7, CW, 1.85,
-         "La clave es la diversificación de errores: cuando el mercado gira, la Capa 1 llega antes; cuando "
+          size=13.6, space_after=0)], accent=AMAR, tsize=17, accent_style="top")
+s.takeaway(MX, CT + 5.7 + 0.12, CW,
+           "La clave es la diversificación de errores: cuando el mercado gira, la Capa 1 llega antes; cuando "
          "hay ruido, la Capa 2 no se deja arrastrar. Sus errores no están correlacionados, y por eso la "
-         "combinación pondera mejor que cualquiera de los dos por separado.", fill=AZUL, size=16)
+         "combinación pondera mejor que cualquiera de los dos por separado.", color=AZUL)
 
 # ═══════════════════════════ 15 · PESOS ═══════════════════════════
 s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Cómo se combinan: pesos calibrados en validación")
@@ -446,15 +477,15 @@ s.card(MX, CT, 5.73, 3.5, "Ponderación NNLS",
        [b("Mínimos cuadrados no negativos: pesos mayores o iguales a cero que suman exactamente 1.",
           size=13.6),
         b("Ningún modelo puede entrar con signo invertido ni dominar por construcción.",
-          size=13.6, space_after=0)], accent=ROJO, tsize=17.5)
+          size=13.6, space_after=0)], accent=ROJO, tsize=17.5, accent_style="top")
 s.card(MX + 6.08, CT, 5.73, 3.5, "Búsqueda en grilla",
        [b("Se evalúa una grilla de umbrales de momentum entre 1,05 y 1,50.", size=13.6),
         b("Para cada valor se reoptimizan los pesos de ruteo y se elige la combinación que minimiza el "
-          "WAPE en validación.", size=13.6, space_after=0)], accent=AMAR, tsize=17.5)
+          "WAPE en validación.", size=13.6, space_after=0)], accent=AMAR, tsize=17.5, accent_style="top")
 s.card(MX + 12.17, CT, 5.73, 3.5, "Ruteo por régimen",
        [b("Indicador de momentum: media móvil de 3 meses sobre media móvil de 12.", size=13.6),
         b("Si la familia acelera, pesa más el componente de nivel dinámico; si está madura, la señal "
-          "conservadora.", size=13.6, space_after=0)], accent=AZUL, tsize=17.5)
+          "conservadora.", size=13.6, space_after=0)], accent=AZUL, tsize=17.5, accent_style="top")
 s.text(MX, CT + 3.85, CW, 0.4, [para("GRILLA DE UMBRALES DE MOMENTUM EVALUADA EN VALIDACIÓN", size=12.5,
                                      bold=True, color=GRAY, space_after=0, spc=2)])
 s.rect(MX, CT + 4.35, 12.6, 1.0, fill=LIGHT, radius=0.06)
@@ -468,11 +499,10 @@ s.text(MX + 5.4, CT + 5.05, 1.8, 0.3, [para("τ*", size=14, bold=True, color=AZU
 s.text(MX + 13.1, CT + 4.35, 4.8, 1.0,
        [para("Para cada umbral de la grilla se reoptimizan los pesos de ruteo; se adopta el que minimiza "
              "el WAPE en validación.", size=12.8, color=TXT, space_after=0, line=1.2)], valign="m")
-s.banner(MX, CT + 6.0, CW, 1.55,
-         "Esto es lo que da sostenibilidad en el tiempo: los pesos no son una constante del modelo, son un "
+s.takeaway(MX, CT + 6.0 + 0.12, CW,
+           "Esto es lo que da sostenibilidad en el tiempo: los pesos no son una constante del modelo, son un "
          "parámetro recalibrable. Si cambia la estructura del mercado, la recalibración reasigna peso hacia "
-         "los modelos que mejor capturan el nuevo régimen, sin rediseñar la arquitectura.",
-         fill=AZUL, size=16)
+         "los modelos que mejor capturan el nuevo régimen, sin rediseñar la arquitectura.", color=AZUL)
 
 # ═══════════════════════════ 16 · CAPA 3 ═══════════════════════════
 s = S("04", "METODOLOGÍA Y ARQUITECTURA", "Capa 3 · De la familia al SKU: desagregación top-down")
@@ -514,10 +544,12 @@ vias = [("Vía A · proporciones históricas", AMAR,
 for i, (tit, col, bs) in enumerate(vias):
     s.card(MX + i * 6.08, CT + 2.85, 5.73, 3.85, tit,
            [b(t, size=13.4, bold=bo, color=(INK if bo else TXT), space_after=10) for t, bo in bs],
-           accent=col, tsize=17)
-s.banner(MX, CT + 6.95, CW, 0.72,
-         "En catálogos con alta intermitencia, la estabilidad de las proporciones históricas le ganó a la "
-         "sofisticación de las cuotas aprendidas.", fill=LIGHT2, color=TXT, size=14.5, bold=False)
+           accent=col, tsize=17, accent_style="top")
+s.takeaway(MX, CT + 6.80, CW,
+           "En catálogos con alta intermitencia, la estabilidad de las proporciones históricas le ganó a la "
+         "sofisticación de las cuotas aprendidas.", color=ROJO)
+
+DIV("05", "Resultados y evidencia", "Diez arquitecturas, siete meses de prueba ciega y un estudio\nde ablación.")
 
 # ═══════════════════════════ 17 · BENCHMARK ═══════════════════════════
 s = S("05", "RESULTADOS Y EVIDENCIA", "Benchmark fuera de muestra: febrero – agosto 2025")
@@ -590,6 +622,8 @@ s.image(f"{F}/fig5_4.png", tx + 0.25, CT + 3.95, 8.1, 3.4)
 s.caption(tx, CT + 7.42, 8.6,
           "Importancia por ganancia total del módulo GBDT: el precio ex-ante concentra el 67,0 %.")
 
+DIV("06", "Impacto y conclusiones", "Qué significa el error de pronóstico en capital de trabajo.")
+
 # ═══════════════════════════ 20 · IMPACTO FINANCIERO ═══════════════════════════
 s = S("06", "IMPACTO Y CONCLUSIONES", "Del error de pronóstico al capital de trabajo")
 fin = [("$105,6M", "CLP de capital de trabajo liberado", "efecto nivel, en balance", AZUL),
@@ -655,9 +689,9 @@ s.card(MX + 9.15, CT, 8.75, 5.5, "Líneas de trabajo futuro",
         b("Extensión a la cola larga del catálogo (1.357 SKUs de baja rotación)."),
         b("Integración del pronóstico al proceso de S&OP y a la política de compra internacional.",
           space_after=0)], accent=AZUL)
-s.banner(MX, CT + 5.85, CW, 1.7,
-         "Declarar los límites con precisión es parte del resultado: define hasta dónde puede extrapolarse "
-         "la evidencia y qué preguntas quedan abiertas para la siguiente iteración.", fill=AZUL, size=16.5)
+s.takeaway(MX, CT + 5.85 + 0.12, CW,
+           "Declarar los límites con precisión es parte del resultado: define hasta dónde puede extrapolarse "
+         "la evidencia y qué preguntas quedan abiertas para la siguiente iteración.", color=AZUL)
 
 # ═══════════════════════════ 23 · CIERRE ═══════════════════════════
 n[0] += 1
@@ -875,9 +909,9 @@ s.card(MX + 9.3, CT + 4.8, 8.6, 1.62, "Qué prueba realmente este diseño",
        [para("Evaluar siete meses con los pesos congelados somete la arquitectura a una prueba de estrés "
              "frente al cambio de régimen, en lugar de premiarla por reajustarse.",
              size=13.2, color=TXT, space_after=0, line=1.2)], accent=AZUL, tsize=16, pad=0.34)
-s.banner(MX, CT + 6.62, CW, 0.9,
-         "El 16,10 % no se obtuvo reentrenando cada mes: se obtuvo con una calibración única anterior a "
-         "enero de 2025 sostenida durante siete meses.", fill=AZUL, size=15.5)
+s.takeaway(MX, CT + 6.62 + 0.12, CW,
+           "El 16,10 % no se obtuvo reentrenando cada mes: se obtuvo con una calibración única anterior a "
+         "enero de 2025 sostenida durante siete meses.", color=AZUL)
 
 s = ANEXO("A8", "Cómo se trató la intermitencia")
 s.stat(MX, CT, 5.73, 2.12, "34,8 %", "de los meses a nivel SKU tienen demanda nula", color=ROJO,
@@ -948,22 +982,21 @@ for i_, (m, t_, p_) in enumerate(dm):
            [para(f"vs. {m}", size=15, color=GRAY, space_after=6),
             para(t_, size=30, bold=True, color=AZUL, space_after=2, line=1.0),
             para(p_, size=15, bold=True, color=INK, space_after=0)], valign="m")
-s.card(MX, CT + 2.65, 8.6, 2.5, "Qué contrasta el test",
+s.card(MX, CT + 2.55, 8.6, 2.5, "Qué contrasta el test",
        [b("Compara la precisión predictiva de dos modelos sobre exactamente los mismos datos.", size=13.4),
         b("Se aplicó sobre errores transversales agrupados, con función de pérdida cuadrática y corrección "
           "HAC.", size=13.4, space_after=0)], accent=AZUL, tsize=17)
-s.card(MX + 9.3, CT + 2.65, 8.6, 2.5, "Alcance declarado en la tesis",
+s.card(MX + 9.3, CT + 2.55, 8.6, 2.5, "Alcance declarado en la tesis",
        [b("Evalúa diferencias bajo pérdida cuadrática: no es un contraste directo sobre el WAPE, sino un "
           "respaldo inferencial consistente.", size=13.4),
         b("Para Chronos-Bolt, Croston, SBA y Seasonal Naïve la comparación se mantiene descriptiva: el "
           "protocolo inferencial se delimitó a priori.", size=13.4, space_after=0)], accent=AMAR, tsize=17)
-s.card(MX, CT + 5.35, CW, 1.5, "Advertencia metodológica reconocida",
+s.card(MX, CT + 5.20, CW, 1.5, "Advertencia metodológica reconocida",
        [para("La literatura econométrica advierte sobre aplicar Diebold-Mariano a paneles agrupados en "
              "horizontes cortos: por eso el test se presenta como evidencia complementaria y no como el "
              "argumento central.", size=13.4, color=TXT, space_after=0, line=1.2)], accent=INK, tsize=16.5)
-s.banner(MX, CT + 7.05, CW, 0.7,
-         "La ventaja del ES-GBM sobre los tres benchmarks primarios no se explica por azar muestral.",
-         fill=AZUL, size=15.5)
+s.takeaway(MX, CT + 6.85, CW,
+           "La ventaja del ES-GBM sobre los tres benchmarks primarios no se explica por azar muestral.", color=AZUL)
 
 s = ANEXO("A11", "Pronóstico vs. demanda real por modelo")
 s.rect(MX, CT, CW, 6.9, fill=WHITE, line=LINE, radius=0.06)
@@ -1043,7 +1076,7 @@ s.card(MX, CT + 5.9, 10.6, 1.65, None,
        accent=AMAR)
 
 s = ANEXO("A16", "Trazabilidad, verificación y uso de herramientas de IA")
-s.card(MX, CT, 8.75, 5.4, "Mecanismos de verificación",
+s.card(MX, CT, 8.75, 5.05, "Mecanismos de verificación",
        [b("Separación cronológica estricta entre entrenamiento, validación y prueba."),
         b("Pruebas automatizadas sobre rezagos y disponibilidad temporal de cada variable."),
         b("Revisión manual de transformaciones y agregaciones jerárquicas."),
@@ -1051,7 +1084,7 @@ s.card(MX, CT, 8.75, 5.4, "Mecanismos de verificación",
         b("Fijación de semillas, versiones de librerías y parámetros de ejecución."),
         b("Verificación de consistencia entre las formulaciones matemáticas y el código.", space_after=0)],
        accent=AZUL)
-s.card(MX + 9.15, CT, 8.75, 5.4, "Uso de herramientas de IA generativa",
+s.card(MX + 9.15, CT, 8.75, 5.05, "Uso de herramientas de IA generativa",
        [b("Apoyo instrumental en programación, depuración, refactorización y revisión de redacción."),
         b("No sustituyó la formulación del problema, la selección de datos, las decisiones metodológicas ni "
           "la interpretación de resultados."),
@@ -1061,11 +1094,10 @@ s.card(MX + 9.15, CT, 8.75, 5.4, "Uso de herramientas de IA generativa",
         b("Por confidencialidad del retailer, los registros transaccionales no son distribuibles; se "
           "conservan scripts, entornos y resultados intermedios para auditoría.", space_after=0)],
        accent=ROJO)
-s.banner(MX, CT + 5.75, CW, 1.7,
-         "El autor definió la arquitectura experimental, las reglas de disponibilidad temporal de las "
+s.takeaway(MX, CT + 5.55, CW,
+           "El autor definió la arquitectura experimental, las reglas de disponibilidad temporal de las "
          "variables, los criterios de comparación, las métricas y los supuestos del impacto financiero. "
-         "La responsabilidad por la exactitud de resultados y conclusiones recae en el autor.",
-         fill=LIGHT2, color=TXT, size=15.5, bold=False)
+         "La responsabilidad por la exactitud de resultados y conclusiones recae en el autor.", color=AZUL)
 
 
 # ═══════════════════════════ NOTAS DEL ORADOR ═══════════════════════════
@@ -1186,6 +1218,12 @@ NOTAS = {
 38: "Anexo A15. Contexto macro: el IPC de vestuario cae de forma sostenida.",
 39: "Anexo A16. Protocolo de verificación y uso declarado de herramientas de IA.",
 }
+# los separadores desplazan la numeración: se recalculan las posiciones
+DIVS_ANTES_DE = [3, 5, 6, 9, 17, 20]
+NOTAS = {k + sum(1 for dd in DIVS_ANTES_DE if dd <= k): v for k, v in NOTAS.items()}
+for j, dd in enumerate(DIVS_ANTES_DE):
+    NOTAS[dd + j] = ("Separador de sección. Pasar rápido: sirve para marcar el cambio de bloque y dar un "
+                     "respiro visual al jurado.")
 for i, sl in enumerate(d.slides, 1):
     if i in NOTAS:
         sl.notes = NOTAS[i]
