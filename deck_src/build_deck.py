@@ -149,11 +149,11 @@ for i, (lab, val) in enumerate([("Primavera", "31 %"), ("Verano", "25 %"), ("Inv
     s.rect(x, 8.42, 2.2, 1.05, fill=WHITE, line=LINE, radius=0.05)
     s.text(x, 8.42, 2.2, 1.05, [para(val, size=20, bold=True, color=AZUL, align="c", space_after=1),
                                 para(lab, size=12, color=GRAY, align="c", space_after=0)], valign="m")
-s.caption(9.65, 9.55, 9.3, "Participación de cada estación en la demanda anual (waffle, anexo A11).")
+s.caption(9.65, 9.55, 9.3, "Participación de cada estación en la demanda anual (waffle, anexo A15).")
 
 # ═══════════════════════════ 4 · EL PROBLEMA ═══════════════════════════
 s = S("01", "CONTEXTO Y PROBLEMA", "Series que prenden y se apagan: demanda intermitente")
-s.stat(MX, CT, 7.5, 2.15, "30,3 %", "de los pares SKU–mes no registran ninguna venta",
+s.stat(MX, CT, 7.5, 2.15, "34,8 %", "de los meses SKU no registran ninguna venta",
        color=ROJO, note="Ceros estructurales, no ruido aleatorio")
 s.card(MX, CT + 2.42, 7.5, 2.35, "Por qué rompe a los modelos clásicos",
        [para("Croston y SBA asumen intermitencia sin estacionalidad; SARIMA asume continuidad. "
@@ -316,7 +316,8 @@ s.text(MX + CW - 6.0, 4.62, 6.0, 0.35, [para("Febrero – agosto 2025  ·  7 mes
                                              size=13, color=AZUL, bold=True, align="r", space_after=0)])
 tcards = [("Entrenamiento", "Aprende los patrones históricos de nivel, estacionalidad y respuesta comercial.", ROJO),
           ("Validación", "Calibra pesos NNLS del ensamble y el umbral de ruteo τ* sin observar el futuro.", AMAR),
-          ("Prueba ciega", "Siete meses evaluados con pesos congelados: simula un despliegue real.", AZUL)]
+          ("Prueba ciega", "Horizonte h = 1: cada mes se pronostica a un mes vista, encadenando siete "
+           "orígenes con los pesos congelados.", AZUL)]
 for i, (t, txt, col) in enumerate(tcards):
     s.card(MX + i * 6.08, 5.5, 5.73, 2.35, t, [para(txt, size=14, color=TXT, space_after=0, line=1.24)],
            accent=col, tsize=17)
@@ -530,7 +531,8 @@ s.card(MX + 11.8, CT, 6.1, 3.05, "Lectura de resultados",
 s.rect(MX + 11.8, CT + 3.35, 6.1, 3.7, fill=WHITE, line=LINE, radius=0.06)
 s.image(f"{C}/benchmark_familia.png", MX + 12.0, CT + 3.5, 5.7, 3.4)
 s.caption(MX, CT + 7.2, CW,
-          "WAPE fuera de muestra sobre 7 meses de prueba ciega. Detalle completo de métricas en el anexo A3.")
+          "WAPE fuera de muestra sobre 7 meses de prueba ciega. Métricas completas en el anexo A3; "
+          "significancia estadística de la diferencia en el anexo A10.")
 
 # ═══════════════════════════ 18 · CALIDAD DEL AJUSTE ═══════════════════════════
 s = S("05", "RESULTADOS Y EVIDENCIA", "Calidad del ajuste: el pronóstico sigue a la demanda real")
@@ -845,13 +847,131 @@ metrica(s, MX + 9.3, 8.6, "R²", "Coeficiente de determinación  ·  cuánta var
         "SKU y 0,96 a nivel familia; SARIMA queda en terreno negativo, es decir, predice peor que usar el "
         "promedio.", AZUL)
 
-s = ANEXO("A7", "Pronóstico vs. demanda real por modelo")
+s = ANEXO("A7", "Ficha técnica del pipeline")
+ficha = [("Horizonte de pronóstico", ROJO,
+          [("h = 1 mes", "Cada predicción es a un mes vista, no a seis."),
+           ("7 orígenes encadenados", "La prueba ciega recorre febrero a agosto de 2025 avanzando mes a mes."),
+           ("Extensión pendiente", "Evaluar h = 3 y h = 6 para el ciclo de compra marítimo.")]),
+         ("Validación rolling-origin", AMAR,
+          [("Walk-forward", "El origen se desplaza en el tiempo; nunca se usa información posterior al "
+                            "punto de corte."),
+           ("C1 = marzo 2024", "Inicio de la ventana que calibra el ensamble, los pesos NNLS y el ruteo."),
+           ("CUT = enero 2025", "Corte que separa definitivamente entrenamiento de prueba.")]),
+         ("Qué se actualiza y qué se congela", AZUL,
+          [("Se actualiza", "El nivel base de Holt se recalcula mes a mes con la historia hasta t−1."),
+           ("Se congela", "Modelos GBDT, pesos NNLS, umbral de ruteo y cuotas quedan fijos desde el corte."),
+           ("Por qué", "Reentrenar cada mes tiene fricción real y riesgo de sobrerreaccionar a anomalías.")])]
+for i_, (tit, col, items) in enumerate(ficha):
+    bs = []
+    for k, (lab, txt) in enumerate(items):
+        bs.append(para(lab, size=13.6, bold=True, color=INK, space_after=2, space_before=(8 if k else 0)))
+        bs.append(para(txt, size=13, color=TXT, space_after=0, line=1.2))
+    s.card(MX + i_ * 6.08, CT, 5.73, 4.5, tit, bs, accent=col, tsize=17)
+s.card(MX, CT + 4.8, 8.6, 1.62, "Reproducibilidad",
+       [para("Cada modelo se entrena con 8 semillas —42, 1, 7, 2025, 99, 3, 11 y 21— y se promedian las "
+             "inferencias; se fijan versiones de librerías y parámetros de ejecución.",
+             size=13.2, color=TXT, space_after=0, line=1.2)], accent=INK, tsize=16, pad=0.34)
+s.card(MX + 9.3, CT + 4.8, 8.6, 1.62, "Qué prueba realmente este diseño",
+       [para("Evaluar siete meses con los pesos congelados somete la arquitectura a una prueba de estrés "
+             "frente al cambio de régimen, en lugar de premiarla por reajustarse.",
+             size=13.2, color=TXT, space_after=0, line=1.2)], accent=AZUL, tsize=16, pad=0.34)
+s.banner(MX, CT + 6.62, CW, 0.9,
+         "El 16,10 % no se obtuvo reentrenando cada mes: se obtuvo con una calibración única anterior a "
+         "enero de 2025 sostenida durante siete meses.", fill=AZUL, size=15.5)
+
+s = ANEXO("A8", "Cómo se trató la intermitencia")
+s.stat(MX, CT, 5.73, 2.12, "34,8 %", "de los meses a nivel SKU tienen demanda nula", color=ROJO,
+       vsize=38, lsize=13, note="A nivel familia las series son densas y continuas")
+s.card(MX + 6.08, CT, 11.82, 2.12, "Zero-filling: lo que sí se hizo",
+       [para("El ERP no guarda una fila cuando no hay venta: simplemente la omite. Se generó el producto "
+             "cartesiano de todos los meses por cada SKU y familia, asignando explícitamente demanda cero "
+             "en los períodos sin movimiento, para poder calcular rezagos y medias móviles consistentes.",
+             size=13.5, color=TXT, space_after=0, line=1.22)], accent=AZUL, tsize=17)
+noes = [("No se imputó la media", "Sustituir los ceros por un promedio inventaría demanda que nunca "
+                                  "existió y aplanaría la estacionalidad real."),
+        ("No se interpoló", "Interpolar entre meses con venta suavizaría artificialmente el patrón "
+                            "intermitente que justamente se quiere modelar."),
+        ("No se eliminaron los ceros", "Un cero no es un dato faltante: es la observación de que ese mes "
+                                       "no hubo venta, y esa información es predictiva.")]
+for i_, (tit, txt) in enumerate(noes):
+    s.card(MX + i_ * 6.08, CT + 2.42, 5.73, 2.4, tit,
+           [para(txt, size=13.2, color=TXT, space_after=0, line=1.22)], accent=ROJO, tsize=16.5)
+s.card(MX, CT + 5.12, CW, 1.85, "Entonces, ¿cómo se resuelve la intermitencia?",
+       [para("Por arquitectura, no por imputación. Se pronostica en el nivel donde la serie es continua y "
+             "tiene estacionalidad clara —la familia comercial— y desde ahí se reparte a cada SKU mediante "
+             "cuotas. El problema del cero deja de ser un problema de modelado y pasa a ser uno de reparto.",
+             size=14, color=TXT, space_after=0, line=1.24)], accent=AZUL)
+s.banner(MX, CT + 7.15, CW, 0.55,
+         "Supuesto declarado: si hay inventario disponible y la venta es cero, se interpreta como demanda "
+         "cero. Los quiebres de stock son la limitación conocida de ese supuesto.",
+         fill=LIGHT2, color=TXT, size=13.5, bold=False)
+
+s = ANEXO("A9", "Hiperparámetros calibrados")
+colsH = [(2.7, "Modelo", "l"), (3.2, "Módulo", "l"), (8.1, "Hiperparámetros", "l"),
+         (3.9, "Función objetivo", "l")]
+rowsH = [("XGBoost", "Ensamble combo",
+          "learning_rate 0,05 · max_depth 6 · subsample 0,90 · colsample_bytree 0,90 · n_estimators 500",
+          "reg:squarederror"),
+         ("LightGBM", "Residual y ensamble global",
+          "learning_rate 0,05 · num_leaves 31 · subsample 0,90 · colsample_bytree 0,90 · n_estimators 600",
+          "regression"),
+         ("CatBoost", "Módulo categórico",
+          "learning_rate 0,05 · depth 6 · iterations 600", "RMSE"),
+         ("TabPFN", "Fundacional tabular",
+          "TabPFNRegressor v2 · n_estimators 2 · inferencia in-context zero-shot · escalado robusto",
+          "Sin ajuste: zero-shot"),
+         ("Motor de cuotas", "Capa 3 · vía dinámica",
+          "LightGBM y XGBoost: n_estimators 500, learning_rate 0,05 · CatBoost por grilla: depth entre 4 y "
+          "8, learning_rate 0,03 o 0,05, iterations 600",
+          "Huber (α = 0,9) y normalización al símplex")]
+yh = tabla_bt(s, MX, CT, CW, colsH, rowsH, rowh=0.92, fsize=12.4)
+s.card(MX, yh + 0.4, 8.6, 1.75, "Cómo se eligieron",
+       [para("Búsqueda en grilla sobre la ventana de validación intermedia (marzo 2024 a enero 2025). "
+             "Ningún hiperparámetro se ajustó mirando el período de prueba.",
+             size=13.4, color=TXT, space_after=0, line=1.22)], accent=AZUL, tsize=16.5)
+s.card(MX + 9.3, yh + 0.4, 8.6, 1.75, "Por qué ocho semillas",
+       [para("Cada configuración se entrena con las semillas 42, 1, 7, 2025, 99, 3, 11 y 21, promediando "
+             "las inferencias: reduce la varianza de inicialización y evita resultados afortunados.",
+             size=13.4, color=TXT, space_after=0, line=1.22)], accent=AMAR, tsize=16.5)
+
+s = ANEXO("A10", "¿Es estadísticamente significativa la diferencia?")
+s.text(MX, CT - 0.04, CW, 0.42,
+       [para("TEST DE DIEBOLD-MARIANO  ·  ES-GBM FRENTE A LOS BENCHMARKS PRIMARIOS", size=12.5, bold=True,
+             color=GRAY, space_after=0, spc=1.8)])
+dm = [("SARIMA", "t = 7,84", "p = 0,0002"), ("SARIMAX", "t = 13,19", "p < 0,0001"),
+      ("LSTM", "t = 10,14", "p = 0,0001")]
+for i_, (m, t_, p_) in enumerate(dm):
+    x = MX + i_ * 6.08
+    s.rect(x, CT + 0.45, 5.73, 1.95, fill=LIGHT, radius=0.06)
+    s.rect(x, CT + 0.45, 0.075, 1.95, fill=AZUL)
+    s.text(x + 0.5, CT + 0.45, 5.0, 1.95,
+           [para(f"vs. {m}", size=15, color=GRAY, space_after=6),
+            para(t_, size=30, bold=True, color=AZUL, space_after=2, line=1.0),
+            para(p_, size=15, bold=True, color=INK, space_after=0)], valign="m")
+s.card(MX, CT + 2.65, 8.6, 2.5, "Qué contrasta el test",
+       [b("Compara la precisión predictiva de dos modelos sobre exactamente los mismos datos.", size=13.4),
+        b("Se aplicó sobre errores transversales agrupados, con función de pérdida cuadrática y corrección "
+          "HAC.", size=13.4, space_after=0)], accent=AZUL, tsize=17)
+s.card(MX + 9.3, CT + 2.65, 8.6, 2.5, "Alcance declarado en la tesis",
+       [b("Evalúa diferencias bajo pérdida cuadrática: no es un contraste directo sobre el WAPE, sino un "
+          "respaldo inferencial consistente.", size=13.4),
+        b("Para Chronos-Bolt, Croston, SBA y Seasonal Naïve la comparación se mantiene descriptiva: el "
+          "protocolo inferencial se delimitó a priori.", size=13.4, space_after=0)], accent=AMAR, tsize=17)
+s.card(MX, CT + 5.35, CW, 1.5, "Advertencia metodológica reconocida",
+       [para("La literatura econométrica advierte sobre aplicar Diebold-Mariano a paneles agrupados en "
+             "horizontes cortos: por eso el test se presenta como evidencia complementaria y no como el "
+             "argumento central.", size=13.4, color=TXT, space_after=0, line=1.2)], accent=INK, tsize=16.5)
+s.banner(MX, CT + 7.05, CW, 0.7,
+         "La ventaja del ES-GBM sobre los tres benchmarks primarios no se explica por azar muestral.",
+         fill=AZUL, size=15.5)
+
+s = ANEXO("A11", "Pronóstico vs. demanda real por modelo")
 s.rect(MX, CT, CW, 6.9, fill=WHITE, line=LINE, radius=0.06)
 s.image(f"{F}/fig5_1.png", MX + 0.4, CT + 0.3, 17.1, 6.3)
 s.caption(MX, CT + 7.05, CW, "Seis arquitecturas representativas contra la demanda observada del Top 100 "
                              "SKUs en la ventana de prueba.")
 
-s = ANEXO("A8", "Diagnóstico de residuos del modelo propuesto")
+s = ANEXO("A12", "Diagnóstico de residuos del modelo propuesto")
 s.rect(MX, CT, CW, 4.6, fill=WHITE, line=LINE, radius=0.06)
 s.image(f"{F}/fig5_5.png", MX + 0.4, CT + 0.3, 17.1, 4.0)
 s.card(MX, CT + 4.9, 8.75, 2.6, "Qué muestra el diagnóstico",
@@ -863,7 +983,7 @@ s.card(MX + 9.15, CT + 4.9, 8.75, 2.6, "Alcance de la conclusión",
         b("No se afirma homocedasticidad estricta; la evidencia es consistente con un comportamiento "
           "residual adecuado.", space_after=0)], accent=MUT, tsize=17)
 
-s = ANEXO("A9", "Intermitencia: del catálogo completo a un SKU")
+s = ANEXO("A13", "Intermitencia: del catálogo completo a un SKU")
 s.rect(MX, CT, 10.4, 7.05, fill=WHITE, line=LINE, radius=0.06)
 s.image(HEATMAP, MX + 0.3, CT + 0.3, 9.8, 6.15)
 s.caption(MX + 0.3, CT + 6.55, 9.8, "Matriz de demanda: 100 SKUs × 66 meses.")
@@ -876,7 +996,7 @@ s.card(MX + 10.8, CT + 4.0, 7.1, 3.05, "Lectura",
         b("La agregación a familia recupera una señal continua y estacional.", size=13.8, space_after=0)],
        accent=AZUL, tsize=17)
 
-s = ANEXO("A10", "Matriz de sensibilidad del impacto financiero (Tabla 6.1)")
+s = ANEXO("A14", "Matriz de sensibilidad del impacto financiero (Tabla 6.1)")
 rows = [("Conservador", "$12.000", "18 %", "$84,5M CLP", "$15,2M CLP/año", False),
         ("Caso base", "$15.000", "22 %", "$105,6M CLP", "$23,2M CLP/año", True),
         ("Exigente (alta merma)", "$18.000", "26 %", "$126,8M CLP", "$33,0M CLP/año", False)]
@@ -910,7 +1030,7 @@ s.card(MX + 9.15, yh + 3.8, 8.75, 1.75, None,
 s.caption(MX, yh + 5.75, CW, "Supuestos: Z = 1,645 (CSL 95 %); SS = Z × MAE × K × raíz(L). Ejercicio ilustrativo "
                              "de orden de magnitud.")
 
-s = ANEXO("A11", "Entorno macro y estacionalidad de la demanda")
+s = ANEXO("A15", "Entorno macro y estacionalidad de la demanda")
 s.rect(MX, CT, 10.6, 5.2, fill=WHITE, line=LINE, radius=0.06)
 s.image(f"{F}/fig2_2.png", MX + 0.35, CT + 0.3, 9.9, 4.6)
 s.caption(MX, CT + 5.35, 10.6, "IPC de vestuario y calzado, serie mensual auditada INE (base 2023 = 100).")
@@ -922,7 +1042,7 @@ s.card(MX, CT + 5.9, 10.6, 1.65, None,
              "estaciones, sin un peak único dominante.", size=13.5, color=TXT, space_after=0, line=1.2)],
        accent=AMAR)
 
-s = ANEXO("A12", "Trazabilidad, verificación y uso de herramientas de IA")
+s = ANEXO("A16", "Trazabilidad, verificación y uso de herramientas de IA")
 s.card(MX, CT, 8.75, 5.4, "Mecanismos de verificación",
        [b("Separación cronológica estricta entre entrenamiento, validación y prueba."),
         b("Pruebas automatizadas sobre rezagos y disponibilidad temporal de cada variable."),
@@ -958,7 +1078,7 @@ NOTAS = {
 3: "1 min 15 s. Tres hechos de la industria: ciclos de 2 a 3 meses, demanda dirigida por el plan comercial "
    "y compromisos de compra con 3 a 6 meses de anticipación. El gráfico muestra la demanda agregada del "
    "núcleo comercial. Transición: en la serie agregada la señal existe; el problema aparece al bajar al SKU.",
-4: "1 min 30 s. 30,3 % de los pares SKU-mes no registran venta. El mapa de calor son 100 SKUs por 66 meses; "
+4: "1 min 30 s. 34,8 % de los meses a nivel SKU no registran venta. El mapa de calor son 100 SKUs por 66 meses; "
    "las zonas claras son ceros. No es ruido, es estructura. Croston y SBA suponen intermitencia sin "
    "estacionalidad, SARIMA supone continuidad. Cerrar con el dilema: sobre-stock inmoviliza capital, "
    "quiebre destruye ingreso.",
@@ -988,7 +1108,10 @@ NOTAS = {
     "arcsinh: reactiva, más volátil. La Capa 2 entrena LightGBM y CatBoost sobre la serie relativa al nivel "
     "que extrae el Holt amortiguado: más estable. Sumando TabPFN son seis predicciones candidatas por "
     "familia. Esas seis entran a validación, donde se fija el peso de cada una. Con esos pesos se obtiene "
-    "la demanda de familia y recién ahí entra la Capa 3, que desagrega a SKU.",
+    "la demanda de familia y recién ahí entra la Capa 3, que desagrega a SKU. SI PREGUNTAN POR QUÉ "
+    "TOP-DOWN Y NO BOTTOM-UP: por la ley de los grandes números. A nivel de SKU las ventas son erráticas e "
+    "intermitentes y confunden a los algoritmos; al agregar a familia el ruido individual se cancela y "
+    "emerge una curva densa con estacionalidad clara. Se predice el bosque y después se reparten las ramas.",
 14: "1 min 15 s. Explicar por qué se entrena dos veces: no es redundancia, es diversificación de errores. "
     "El track sin suavizar llega antes cuando el mercado gira; el suavizado no se deja arrastrar por el "
     "ruido. Como sus errores no están correlacionados, la combinación pondera mejor que cualquiera solo. "
@@ -1025,27 +1148,43 @@ NOTAS = {
     "resultado por fuga de información.",
 22: "1 min. Limitaciones primero y con seguridad: horizonte de un mes, un solo retailer, ventana sin el peak "
     "de noviembre-diciembre, ejercicio financiero ilustrativo. Luego trabajo futuro.",
-23: "Cierre. Agradecer al profesor guía, a la profesora correferente y a la empresa por los datos. Silencio "
-    "y esperar preguntas. Los anexos A1 a A7 respaldan las respuestas.",
-24: "Anexo A1. Glosario de los modelos de referencia en lenguaje simple. Es la lámina para responder "
-    "cualquier pregunta del tipo por qué no usó tal método o qué diferencia hay entre Croston y SARIMA.",
-25: "Anexo A2. Los componentes de la arquitectura propia y por qué cada uno está donde está. Útil si "
-    "preguntan por qué tres GBDT distintos o para qué sirve TabPFN.",
-26: "Anexo A3. Tabla 5.1 completa: WAPE, sMAPE, RMSE, MAE, sesgo, R2 y ranking en los dos niveles de "
-    "agregación. Es la lámina de respaldo para cualquier cifra que pregunten.",
-27: "Anexo A4. Fórmulas de WAPE y MAPE con el significado de cada símbolo. Usar si piden justificar por "
-    "qué el WAPE es la métrica rectora: el MAPE se indetermina con demanda cero.",
-28: "Anexo A5. Fórmulas de MAE y RMSE. El MAE es el que conecta con el cálculo de stock de seguridad; el "
-    "RMSE castiga los errores grandes de los peaks.",
-29: "Anexo A6. Fórmulas de Bias y R2. El sesgo dice hacia qué lado se equivoca el modelo: −4,8 % es "
-    "subestimación leve, que en inventario es el error más barato.",
-30: "Anexo A7. Comparativa visual de seis arquitecturas contra la demanda real.",
-31: "Anexo A8. Residuos: Ljung-Box p = 0,751 y Shapiro-Wilk p = 0,184. Usar si preguntan por supuestos.",
-32: "Anexo A9. Evidencia de intermitencia: matriz completa y un SKU con 62 % de meses en cero.",
-33: "Anexo A10. Sensibilidad financiera: 84,5 a 126,8 millones bajo gestión descentralizada y 8,5 a 12,7 "
-    "millones con risk pooling. Usar si cuestionan el supuesto de agregación.",
-34: "Anexo A11. Contexto macro: el IPC de vestuario cae de forma sostenida. Estacionalidad repartida.",
-35: "Anexo A12. Protocolo de verificación y uso declarado de herramientas de IA.",
+23: "Cierre. Agradecer al profesor guía, a la profesora correferente y a la empresa por los datos. "
+    "Silencio y esperar preguntas. ÍNDICE RÁPIDO DE ANEXOS PARA EL TURNO DE PREGUNTAS: A1 y A2 "
+    "glosario de modelos; A3 tabla completa de métricas; A4 a A6 fórmulas; A7 horizonte, rolling-origin y "
+    "qué se congela; A8 tratamiento de la intermitencia; A9 hiperparámetros; A10 significancia estadística; "
+    "A11 comparativa por modelo; A12 residuos; A13 evidencia de intermitencia; A14 sensibilidad financiera; "
+    "A15 contexto macro; A16 trazabilidad y uso de IA.",
+24: "Anexo A1. Glosario de los modelos de referencia en lenguaje simple. Para responder por qué no usó "
+    "tal método o qué diferencia hay entre Croston y SARIMA.",
+25: "Anexo A2. Los componentes de la arquitectura propia y por qué cada uno está donde está.",
+26: "Anexo A3. Tabla 5.1 completa: WAPE, sMAPE, RMSE, MAE, sesgo, R2 y ranking en ambos niveles.",
+27: "Anexo A4. Fórmulas de WAPE y MAPE con el significado de cada símbolo.",
+28: "Anexo A5. Fórmulas de MAE y RMSE. El MAE conecta con el cálculo de stock de seguridad.",
+29: "Anexo A6. Fórmulas de Bias y R2. El sesgo dice hacia qué lado se equivoca el modelo.",
+30: "Anexo A7. FICHA TÉCNICA: horizonte h = 1 mes encadenado sobre siete orígenes; validación "
+    "rolling-origin walk-forward con dos cortes, C1 en marzo de 2024 y CUT en enero de 2025. Clave para "
+    "la pregunta sobre reentrenamiento: el nivel de Holt se actualiza mes a mes, pero los modelos GBDT, "
+    "los pesos NNLS, el umbral de ruteo y las cuotas quedan congelados desde el corte durante los siete "
+    "meses. Eso es una prueba de estrés, no una ventaja.",
+31: "Anexo A8. INTERMITENCIA: se aplicó zero-filling, es decir, se completó la grilla mes por SKU "
+    "asignando cero explícito donde el ERP no guarda fila. No se imputó la media, no se interpoló y no se "
+    "eliminaron los ceros: un cero es una observación, no un dato faltante. La intermitencia se resuelve "
+    "por arquitectura, agregando a familia y desagregando por cuotas. 34,8 % de meses en cero a nivel SKU.",
+32: "Anexo A9. HIPERPARÁMETROS: elegidos por búsqueda en grilla sobre la ventana de validación, nunca "
+    "sobre el test. Ocho semillas promediadas. Si piden un valor concreto: XGBoost con learning_rate 0,05, "
+    "max_depth 6 y 500 árboles; LightGBM con 31 hojas y 600 árboles; CatBoost con depth 6 y 600 "
+    "iteraciones; TabPFN en modo zero-shot sin ajuste.",
+33: "Anexo A10. SIGNIFICANCIA: test de Diebold-Mariano con corrección HAC sobre errores agrupados. "
+    "Frente a SARIMA t = 7,84 con p = 0,0002; frente a SARIMAX t = 13,19 con p menor a 0,0001; frente a "
+    "LSTM t = 10,14 con p = 0,0001. Aclarar el alcance: contrasta bajo pérdida cuadrática, no directamente "
+    "sobre el WAPE, y para los modelos de frontera la comparación se mantiene descriptiva.",
+34: "Anexo A11. Comparativa visual de seis arquitecturas contra la demanda real.",
+35: "Anexo A12. Residuos: Ljung-Box p = 0,751 y Shapiro-Wilk p = 0,184.",
+36: "Anexo A13. Evidencia de intermitencia: matriz completa y un SKU con 62 % de meses en cero.",
+37: "Anexo A14. Sensibilidad financiera: 84,5 a 126,8 millones bajo gestión descentralizada y 8,5 a 12,7 "
+    "millones con risk pooling.",
+38: "Anexo A15. Contexto macro: el IPC de vestuario cae de forma sostenida.",
+39: "Anexo A16. Protocolo de verificación y uso declarado de herramientas de IA.",
 }
 for i, sl in enumerate(d.slides, 1):
     if i in NOTAS:
